@@ -3,6 +3,7 @@
 # Authors: Michele Claibourn, others
 # Updated: February 3, 2022
 #          February 8, 2022 - jacob-gg
+#          February 9, 2022 - jacob-gg
 # ....................................
 
 
@@ -14,10 +15,9 @@
 library(shiny)
 library(tidyverse)
 library(plotly)
-library(leaflet)
 library(biscale)
 library(sf)
-library(leafem)
+library(magick)
 
 df <- readRDS("data/cvl_data.RDS")
 # cvl_data.RDS prepared in combine_data.R
@@ -66,7 +66,7 @@ ui <- fluidPage(
                                             choices = varlist,
                                             selected = varlist[2]))
                          )),
-              tabPanel('Map', leafletOutput(outputId = 'leaf', width = '100%')))
+              tabPanel('Map', plotlyOutput('map', width = '100%', height = '100%')))
 )
 
 
@@ -90,43 +90,50 @@ server <- function(input, output) {
   })
 
   # rebuild map whenever input variables are updated
-  output$leaf <- renderLeaflet({
-    # generate and save new legend svg
+  output$map <- renderPlotly({
+    # generate and save new legend
+    if (file.exists('www/bivariate_legend.png')) {file.remove('www/bivariate_legend.png')}
     bipal_ <- bipal_logo %>%
       separate(group, into = c(input$indicator1, input$indicator2), sep = "-") %>%
       mutate(x = as.integer(eval(sym(input$indicator1))),
              y = as.integer(eval(sym(input$indicator2))))
-    legend_ <- ggplot() +
-      geom_tile(data = bipal_, mapping = aes(x = x, y = y, fill = fill)) +
-      scale_fill_identity() + theme_void() + coord_fixed() +
+    legend_ <- ggplot(bipal_, mapping = aes(x = x, y = y, fill = fill)) +
+      geom_tile() + scale_fill_identity() + theme_void() + coord_fixed() +
       labs(x = paste0("Higher ", input$indicator1, " \u2192"), # Check if these are right in terms of y/x axes
            y = paste0("Higher ", input$indicator2, " \u2192")) +
       theme(axis.title = element_text(size = 6), axis.title.y = element_text(angle = 90))
-    ggsave(plot = legend_, filename = 'www/bivariate_legend.svg', width = 1, height = 1)
+    ggsave(plot = legend_, filename = 'www/bivariate_legend.png', width = 1, height = 1, dpi = 320)
 
     # merge reactive data with geometry, get bi_class values, and generate palette for Leaflet
     to_map <- merge(data(), geo, by = 'locality')
     to_map <- bi_class(to_map, x = x, y = y, style = "quantile", dim = 3)
     to_map <- st_transform(st_as_sf(to_map), 4326)
-    factpal <- colorFactor(bipal, domain = to_map$bi_class)
 
-    leaflet() %>%
-      addProviderTiles("CartoDB.Positron") %>%
-      addPolygons(data = to_map,
-                  fillColor = ~factpal(bi_class),
-                  weight = 1,
-                  opacity = 1,
-                  color = "white",
-                  fillOpacity = 0.8,
-                  highlight = highlightOptions(
-                    weight = 2,
-                    fillOpacity = 0.8,
-                    bringToFront = T)) %>%
-      # addLogo() will look in www/ by default if src is `remote`
-      addLogo('bivariate_legend.svg', src = "remote",
-              position = "topleft", width = 100, height = 100, alpha = 0.8)
+    # make plot and pass to plotly
+    mm <- ggplot(to_map) +
+      geom_sf(aes(geometry = geometry, fill = bi_class), color = 'white', size = .1, show.legend = F) +
+      theme_void() + labs(title = '') + theme(legend.position='none')
+    mm <- ggplotly(mm)
+
+    # embed reactive legend in the plot
+    mm <- mm %>% layout(
+      images = list(
+        list(
+          source =  raster2uri(as.raster(image_read('www/bivariate_legend.png'))),
+          xref = "x domain",
+          yref = "y domain",
+          x = .7,
+          y = .95,
+          sizex = .25,
+          sizey = .25,
+          opacity = 1,
+          layer = "below"
+        )), margin = list(l = 50, r = 50, b = 50, t = 50),
+      title = paste0(input$indicator1, ' x ', input$indicator2),
+      xaxis = list(title = input$indicator1),
+      yaxis = list(title = input$indicator2))
+    mm
   })
-
 }
 
 # Run the application ----
