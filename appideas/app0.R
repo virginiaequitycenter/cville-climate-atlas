@@ -26,7 +26,7 @@ df <- readRDS("data/cvl_data.RDS")
 varlist <- df %>% select(where(is.numeric)) %>% names()
 
 # read geometry
-geo <- readRDS('data/cvl_data_geo.RDS') %>% select(locality, geometry)
+geo <- readRDS('data/cvl_data_geo.RDS') %>% select(locality, geoid, geometry)
 
 # create palette for use in bichoropleth palette function
 bipal <- c("#e8e8e8", "#dfd0d6", "#be64ac", # A-1, A-2, A-3,
@@ -80,7 +80,8 @@ server <- function(input, output) {
       dplyr::select(x = !!sym(input$indicator1),
                     y = !!sym(input$indicator2),
                     locality = locality,
-                    pop = totalpopE)
+                    pop = totalpopE,
+                    geoid = geoid)
   })
 
   # produce scatterplot
@@ -105,14 +106,14 @@ server <- function(input, output) {
     ggsave(plot = legend_, filename = 'www/bivariate_legend.png', width = 1, height = 1, dpi = 320)
 
     # merge reactive data with geometry, get bi_class values, and generate palette for Leaflet
-    to_map <- merge(data(), geo, by = 'locality')
+    to_map <- merge(data(), geo, by = 'geoid')
     to_map <- bi_class(to_map, x = x, y = y, style = "quantile", dim = 3)
     to_map <- st_transform(st_as_sf(to_map), 4326)
 
     # make plot and pass to plotly
     mm <- ggplot(to_map) +
       geom_sf(aes(geometry = geometry, fill = bi_class), color = 'white', size = .1, show.legend = F) +
-      theme_void() + labs(title = '') + theme(legend.position='none')
+      theme_void() + labs(title = '') + theme(legend.position='none') + scale_fill_manual(values = bipal)
     mm <- ggplotly(mm)
 
     # embed reactive legend in the plot
