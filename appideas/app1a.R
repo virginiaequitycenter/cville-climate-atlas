@@ -6,9 +6,7 @@
 
 
 # Phase 1a: select indicators, ouptput plotly scatterplot, add sample header
-#    app0.R uses ggplot, app1.R uses plotly and adds sample header
 #    to do: look into line.width warnings
-#    to do: create space between sample header and app
 
 
 # ....................................

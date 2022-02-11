@@ -6,30 +6,31 @@
 
 
 # Phase 1a: select indicators, ouptput plotly scatterplot, add sample header
-#    app0.R uses ggplot, app1.R uses plotly and adds sample header
 #    to do: look into line.width warnings
-#    to do: create space between sample header and app
-# Phase 1b: select localities to plot, add tabs for other components
+# Phase 1b: select localities to plot, add tabs for other components, add navbar
 #    to do: add select/unselect all button
 
 # Phase 1c:
 #    add varname improvements, locality/tract names (use google sheet, meta names) (app1c)
 #    add reactive variable information to information tab (use google sheet, meta info) (app1c)
-#    add figure title/scaptions/information (code and google sheet, meta names/info) (app1c)
+#    add figure title/captions/information (code and google sheet, meta names/info) (app1c)
+
 # To do anytime
-#    add data and selector for geography ((county?, tract, block group, (block?)) (in row 2)
+#    add data and selector for geography ((county?, tract, block group, (block?)) (in fluid row 2)
 #    start thinking about theme, aesthetic elements
 
-# Phase 2: output for tercile graph (ask lee to take a stab, use app0/app1 at start; call it app0a)
+# Phase 2: output for tercile graph
 
-# Phase 3: output bichoropleth (ask Jacob to take a stab, use app0/app1 as start; call it app0b)
-#    add selector for base map (in row 2)
+# Phase 3: output bichoropleth 
+#    add selector for base map (in fluid row 2)
 #    add layering points (parks, schools, food retailers?)
 
-# Phase 4: add helper information, make aesthetic improvements, programming improvements 
-#   maybe intro info/popup? or landing/hero section on top?
+# Phase 4: add component-wise helper information, make aesthetic improvements, programming improvements 
+#   add documentation info, about info; come up with better header image
 #   consider pulling out/chunking up and source some stuff...
+
 # Phase 5: select and add all variables (update google sheet, meta)
+
 
 # ....................................
 # Load libraries and data
