@@ -42,7 +42,7 @@ df <- readRDS("data/cvl_data.RDS")
 # cvl_data.RDS prepared in combine_data.R
 
 # list of variables for selections
-varlist <- df %>% select(where(is.numeric)) %>% names() 
+varlist <- geo %>% select(where(is.numeric), -pop) %>% names()
 
 
 # ....................................

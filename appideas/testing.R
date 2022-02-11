@@ -62,3 +62,53 @@ subplot(xhist, plotly_empty(), xyscatter, yhist,
 # https://stackoverflow.com/questions/39798042/r-shiny-how-to-use-multiple-inputs-from-selectinput-to-pass-onto-select-optio
 # https://shiny.rstudio.com/reference/shiny/1.6.0/varSelectInput.html
 # https://community.rstudio.com/t/use-shiny-to-choose-column-equality-and-value-to-filter-by-conditions/47449
+
+library(sf)
+library(leaflet)
+library(leafem)
+library(biscale)
+
+geo <- readRDS("appideas/data/cvl_data_geo.RDS")
+
+varlist <- geo %>% select(where(is.numeric), -pop) %>% names()
+
+# create palette for use in bichoropleth palette function
+bipal <- c("#e8e8e8", "#dfd0d6", "#be64ac", # A-1, A-2, A-3,
+           "#ace4e4", "#a5add3", "#8c62aa", # B-1, B-2, B-3
+           "#5ac8c8", "#5698b9", "#3b4994") # C-1, C-2, C-3
+
+# create palette object for logo generation
+bipal_logo <- tibble("3-3" = "#3b4994", "2-3" = "#8c62aa", "1-3" = "#be64ac",
+                     "3-2" = "#5698b9", "2-2" = "#a5add3", "1-2" = "#dfd0d6",
+                     "3-1" = "#5ac8c8", "2-1" = "#ace4e4", "1-1" = "#e8e8e8") %>%
+  gather("group", "fill")
+
+
+tmp <- geo %>%
+  dplyr::select(x = totalpopE,
+                y = whiteE,
+                locality = locality, 
+                pop = pop)
+
+
+to_map <- bi_class(tmp, x = x, y = y, style = "quantile", dim = 3)
+to_map <- st_transform(st_as_sf(to_map), 4326)
+factpal <- colorFactor(bipal, domain = to_map$bi_class)
+
+leaflet() %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addPolygons(data = to_map,
+              fillColor = ~factpal(bi_class),
+              weight = 1,
+              opacity = 1,
+              color = "white",
+              fillOpacity = 0.8,
+              highlight = highlightOptions(
+                weight = 2,
+                fillOpacity = 0.8,
+                bringToFront = T)) %>%
+  # addLogo() will look in www/ by default if src is `remote`
+  addLogo('appideas/www/bivariate_legend.svg', src = "remote",
+          position = "topleft", width = 100, height = 100, alpha = 0.8)
+
+

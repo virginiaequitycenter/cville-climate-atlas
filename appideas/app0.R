@@ -14,11 +14,11 @@ library(shiny)
 library(tidyverse)
 library(plotly)
 
-df <- readRDS("data/cvl_data.RDS")
-# cvl_data.RDS prepared in combine_data.R
+df <- readRDS('data/cvl_data_geo.RDS') 
+# cvl_data_geo.RDS prepared in combine_data.R
 
 # list of variables for selections
-varlist <- df %>% select(where(is.numeric)) %>% names() 
+varlist <- geo %>% select(where(is.numeric), -pop) %>% names()
 
 
 # ....................................
@@ -65,7 +65,7 @@ server <- function(input, output) {
       dplyr::select(x = !!sym(input$indicator1), 
                     y = !!sym(input$indicator2), 
                     locality = locality,
-                    pop = totalpopE)
+                    pop = pop)
   })
   
   # produce scatterplot

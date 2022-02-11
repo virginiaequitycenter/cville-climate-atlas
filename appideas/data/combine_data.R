@@ -111,4 +111,17 @@ save(df, df_sf, file = "appideas/cvl_dat.RData")
 # load("appideas/cvl_dat.RData")
 
 
-# Test visuals ----
+# # add pop = totalpopE
+# library(tidyverse)
+# 
+# df <- readRDS("appideas/data/cvl_data.Rds")
+# df <- df %>%
+#   mutate(pop = totalpopE)
+# 
+# geo <- readRDS("appideas/data/cvl_data_geo.Rds")
+# geo <- geo %>%
+#   mutate(pop = totalpopE)
+# 
+# saveRDS(df, file = "appideas/cvl_data.Rds")
+# saveRDS(geo, file = "appideas/cvl_data_geo.Rds")
+# save(df, geo, file = "appideas/cvl_dat.RData")
