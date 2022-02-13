@@ -83,20 +83,42 @@ bipal_logo <- tibble("3-3" = "#3b4994", "2-3" = "#8c62aa", "1-3" = "#be64ac",
                      "3-1" = "#5ac8c8", "2-1" = "#ace4e4", "1-1" = "#e8e8e8") %>%
   gather("group", "fill")
 
+# generate and save new legend svg
+bipal_logo2 <- bipal_logo %>%
+  separate(group, into = c("var1", "var2"), sep = "-") 
 
-tmp <- geo %>%
+legend_ <- ggplot() +
+  geom_tile(data = bipal_logo2, mapping = aes(x = var1, y = var2, fill = fill)) +
+  scale_fill_identity() + theme_void() + coord_fixed() +
+  labs(x = paste0("Higher ", "Variable 1", " \u2192"), # Check if these are right in terms of y/x axes
+       y = paste0("Higher ", "Variable 2", " \u2192")) +
+  theme(axis.title = element_text(size = 6), axis.title.y = element_text(angle = 90))
+ggsave(plot = legend_, filename = 'appideas/www/bivariate_legend_static.svg', width = 1, height = 1)
+
+
+tmp <- df %>%
+  dplyr::filter(locality %in% c("540", "003", "065")) %>% 
   dplyr::select(x = totalpopE,
                 y = whiteE,
                 locality = locality, 
-                pop = pop)
+                tract = tract,
+                pop = pop,
+                geoid = geoid)
 
+geo2 <- geo %>% select(geoid, geometry)
 
+to_map <- left_join(tmp, geo2, by = "geoid")
 to_map <- bi_class(tmp, x = x, y = y, style = "quantile", dim = 3)
 to_map <- st_transform(st_as_sf(to_map), 4326)
 factpal <- colorFactor(bipal, domain = to_map$bi_class)
 
 leaflet() %>%
   addProviderTiles("CartoDB.Positron") %>%
+
+    # addLogo() will look in www/ by default if src is `remote`
+  addLogo('appideas/www/bivariate_legend.svg', src = "local",
+          position = "topleft", width = 100, height = 100, alpha = 0.8) %>% 
+  
   addPolygons(data = to_map,
               fillColor = ~factpal(bi_class),
               weight = 1,
@@ -106,9 +128,5 @@ leaflet() %>%
               highlight = highlightOptions(
                 weight = 2,
                 fillOpacity = 0.8,
-                bringToFront = T)) %>%
-  # addLogo() will look in www/ by default if src is `remote`
-  addLogo('appideas/www/bivariate_legend.svg', src = "remote",
-          position = "topleft", width = 100, height = 100, alpha = 0.8)
-
+                bringToFront = T))
 

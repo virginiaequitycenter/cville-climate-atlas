@@ -48,67 +48,67 @@ varlist <- geo %>% select(where(is.numeric), -pop) %>% names()
 # ....................................
 # Define User Interface ----
 ui <- navbarPage("Regional Climate Equity Atlas",
-  
-  # start initial tab: indicator selectors and main plot
-  tabPanel("Main",
-           # App title ----
-           titlePanel(div(
-             windowTitle = "Cville Climate Equity Atlas",
-             img(src = "ec_climate_logo.png", height='200', class = "bg"),
-           )),
-           
-           tags$br(),
-           
-           fluidRow(
-             
-             # Sidebar for indicator 1
-             column(2, 
-                    selectInput(inputId = "indicator1",
-                                label = h4("Select X-Axis"),
-                                choices = varlist,
-                                selected = varlist[1])
-             ),
-             
-             # Place scatterplot
-             column(8, 
-                    tabsetPanel(
-                      tabPanel(title = "Scatterplot",
-                               plotlyOutput(outputId = "scatterplot")
-                      ),
-                      tabPanel(title = "Bichoropleth"),
-                      tabPanel(title = "Terciles"),
-                      tabPanel(title = "Indicators")
-                    )
-             ),
-             
-             # Sidebar for indicator 2
-             column(2,
-                    selectInput(inputId = "indicator2",
-                                label = h4("Select Y-Axis"),
-                                choices = varlist,
-                                selected = varlist[2])
-             )
-           ),
-           
-           tags$hr(),
-           
-           # start second row: county selector (geography selector; base map selector)
-           fluidRow(
-             
-             column(4, 
-                    checkboxGroupInput(inputId = "locality",
-                                       label = h4("Select Localities"),
-                                       choices = unique(df$locality),
-                                       selected = unique(df$locality),
-                                       inline = TRUE)
-             )
-             
-           )
-           
-           ),
-  tabPanel("Documentation"),
-  tabPanel("About")
-  
+                 
+                 # start initial tab: indicator selectors and main plot
+                 tabPanel("Main",
+                          # App title ----
+                          titlePanel(div(
+                            windowTitle = "Cville Climate Equity Atlas",
+                            img(src = "ec_climate_logo.png", height='200', class = "bg"),
+                          )),
+                          
+                          tags$br(),
+                          
+                          fluidRow(
+                            
+                            # Sidebar for indicator 1
+                            column(2, 
+                                   selectInput(inputId = "indicator1",
+                                               label = h4("Select X-Axis"),
+                                               choices = varlist,
+                                               selected = varlist[1])
+                            ),
+                            
+                            # Place scatterplot
+                            column(8, 
+                                   tabsetPanel(
+                                     tabPanel(title = "Scatterplot",
+                                              plotlyOutput(outputId = "scatterplot")
+                                     ),
+                                     tabPanel(title = "Bichoropleth"),
+                                     tabPanel(title = "Terciles"),
+                                     tabPanel(title = "Indicators")
+                                   )
+                            ),
+                            
+                            # Sidebar for indicator 2
+                            column(2,
+                                   selectInput(inputId = "indicator2",
+                                               label = h4("Select Y-Axis"),
+                                               choices = varlist,
+                                               selected = varlist[2])
+                            )
+                          ),
+                          
+                          tags$hr(),
+                          
+                          # start second row: county selector (geography selector; base map selector)
+                          fluidRow(
+                            
+                            column(4, 
+                                   checkboxGroupInput(inputId = "locality",
+                                                      label = h4("Select Localities"),
+                                                      choices = unique(df$locality),
+                                                      selected = unique(df$locality),
+                                                      inline = TRUE)
+                            )
+                            
+                          )
+                          
+                 ),
+                 tabPanel("Documentation"),
+                 tabPanel("About")
+                 
 )
 
 
