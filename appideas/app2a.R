@@ -6,24 +6,22 @@
 
 
 # Phase 1a: select indicators, ouptput plotly scatterplot, add sample header
-#    to do: look into line.width warnings
+#    to do: look into line.width warnings (and no trace specified warnings)
 # Phase 1b: select localities to plot, add tabs for other components, add navbar
-#    to do: add select/unselect all button
+#    to do: add select/unselect all button?
 
-# Phase 1c:
-#    add varname improvements, locality/tract names (use google sheet, meta names) (app1c)
-#    add reactive variable information to information tab (use google sheet, meta info) (app1c)
-#    add figure title/captions/information (code and google sheet, meta names/info) (app1c)
+# Phase 2a: integrate bichoropleth; add base map selector
+#    to do: settle on legend solution
+#    to do: add layering points (parks, schools, food retailers?)
 
 # To do anytime
-#    add data and selector for geography ((county?, tract, block group, (block?)) (in fluid row 2)
+#    add varname improvements, locality/tract names (use google sheet, meta names)
+#    add reactive variable information below var selector (use google sheet, meta info)
+#    add figure title/captions/information (code and google sheet, meta names/info) 
+#    add data and selector for geography (add block group; add county or block?) (in fluid row 2)
 #    start thinking about theme, aesthetic elements
 
-# Phase 2: output for tercile graph
-
-# Phase 3: output bichoropleth 
-#    add selector for base map (in fluid row 2)
-#    add layering points (parks, schools, food retailers?)
+# Phase 3: output for tercile graph
 
 # Phase 4: add component-wise helper information, make aesthetic improvements, programming improvements 
 #   add documentation info, about info; come up with better header image
@@ -74,7 +72,10 @@ ui <- navbarPage("Regional Climate Equity Atlas",
                     selectInput(inputId = "indicator1",
                                 label = h4("Select Variable 1 (X)"),
                                 choices = varlist,
-                                selected = varlist[1])
+                                selected = varlist[1]),
+                    # variable definitions
+                    strong(textOutput("ind1_name")), 
+                    textOutput("ind1_defn")
              ),
              
              # Place figures
@@ -87,8 +88,7 @@ ui <- navbarPage("Regional Climate Equity Atlas",
                                div(style="text-align:center",
                                    img(src = "bivariate_legend_static.svg", height='200', class = "bg", align="center"))
                                ),
-                      tabPanel(title = "Terciles"),
-                      tabPanel(title = "Indicators")
+                      tabPanel(title = "Terciles")
                     )
              ),
              
@@ -97,7 +97,10 @@ ui <- navbarPage("Regional Climate Equity Atlas",
                     selectInput(inputId = "indicator2",
                                 label = h4("Select Variable 2 (Y)"),
                                 choices = varlist,
-                                selected = varlist[2])
+                                selected = varlist[2]),
+                    # variable definitions
+                    strong(textOutput("ind2_name")), 
+                    textOutput("ind2_defn")
              )
            ),
            
@@ -112,7 +115,17 @@ ui <- navbarPage("Regional Climate Equity Atlas",
                                        choices = unique(df$locality),
                                        selected = unique(df$locality),
                                        inline = TRUE)
+             ),
+             
+            # base map selector
+             column(4, 
+                    radioButtons(inputId = "base_map",
+                                 label = h4("Select a Base Map"),
+                                 choices = c("Minimal" = "CartoDB.Positron",
+                                             "Detailed" = "OpenStreetMap.Mapnik"),
+                                 inline = TRUE)
              )
+             
              
            )
            
@@ -146,21 +159,22 @@ server <- function(input, output) {
   output$scatterplot <- renderPlotly({
     
     xhist <- plot_ly(data = data(), x = ~x,
-                     type = 'histogram', nbinsx = 20,
+                     type = "histogram", nbinsx = 20,
                      alpha =.75, color = I("grey")) %>%
       layout(yaxis = list(showgrid = FALSE,
                           showticklabels = FALSE),
              xaxis = list(showticklabels = FALSE))
     
     yhist <- plot_ly(data = data(), y = ~y, 
-                     type = 'histogram', nbinsx = 20, 
+                     type = "histogram", nbinsx = 20, 
                      alpha = .75, color = I("grey")) %>%
       layout(xaxis = list(showgrid = FALSE,
                           showticklabels = FALSE),
              yaxis = list(showticklabels = FALSE))
     
     xyscatter <- plot_ly(data = data(), x = ~x, y = ~y,
-                         type = 'scatter',
+                         type = "scatter",
+                         mode = "markers",
                          size = ~pop, sizes = c(1, 500),
                          color = ~locality, colors = "Dark2",
                          alpha = .75,
@@ -193,7 +207,7 @@ server <- function(input, output) {
     factpal <- colorFactor(bipal, domain = to_map$bi_class)
     
     leaflet() %>%
-      addProviderTiles("CartoDB.Positron") %>%
+      addProviderTiles(input$base_map) %>%
       
       addPolygons(data = to_map,
                   fillColor = ~factpal(bi_class),
@@ -209,6 +223,31 @@ server <- function(input, output) {
                                  input$indicator2, ": ", data()$y, "<br>",
                                  paste0(data()$locality, ", ", data()$tract))
                   )
+  })
+  
+  
+  # indicator 1 info
+  output$ind1_name <- renderText({
+    input$indicator1
+#    attr(md()[[input$indicator1]], "goodname")
+  })
+  
+  # output indicator 1 description, for Source & Definition box
+  output$ind1_defn <- renderText({
+    "add me"
+#    attr(md()[[input$indicator1]], "about") 
+  })
+  
+  # indicator 2 info
+  output$ind2_name <- renderText({
+    input$indicator2
+#    attr(md()[[input$indicator2]], "goodname")
+  })
+  
+  # output indicator 2 description, for Source & Definition box
+  output$ind2_defn <- renderText({
+    "add me"
+#    attr(md()[[input$indicator2]], "about") 
   })
   
 }
