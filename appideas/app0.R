@@ -104,7 +104,7 @@ server <- function(input, output, session) {
   # build static parts of map, and display initial outline of region
   output$leaf <- renderLeaflet({
     leaflet() %>% addProviderTiles("CartoDB.Positron") %>%
-      addPolygons(data = geo_df, color = 'white', stroke = .1) %>%
+      addPolygons(data = geo_df, color = 'white', opacity = 0) %>%
       addLogo('bivariate_legend.svg', src = "remote",
               position = "topleft", width = 100, height = 100, alpha = 0.8)
   })
