@@ -1,11 +1,11 @@
 ## ......................................
 ## Combine cville collection data for app
 ## Starting with tract data
-##   (add county, block group, blocks later)
+##   (add block group, blocks, county later)
 ## 
 ## Authors: Michele Claibourn
 ## Created: 2022-01-31
-## Updated: 
+## Updated: 2022-02-14
 ## ......................................
 
 # Setup ----
@@ -15,113 +15,222 @@ library(janitor)
 library(sf)
 
 
-# Read data ----
-tract_shape <- readRDS("data/cville_tracts.RDS") %>% 
-  clean_names() %>% 
-  select(geoid, locality = countyfp, name,
-         geometry)
+## ......................................
+# Read in data ----
+# wanted to read in all tract data,
+#   but same-named, different-formatted vars causing problems;
+#   in later data acquisition updates, enforce common naming
+#   for geoid, locality/county, tract, etc.
 
-# tract_files <- dir(path = "data", pattern = "tract.csv") 
+# tract_files <- dir(path = "data-csv", pattern = "tract.csv") 
 # data <- tract_files %>%
-#     map(~ read_csv(file.path("data", .)))
+#     map(~ read_csv(file.path("data-csv", .)))
+## ......................................
 
-acs <- read_csv("data/acs_cville_tract.csv") %>% 
+
+acs <- read_csv("data-csv/acs_cville_tract.csv") %>% 
   mutate(geoid = as.character(GEOID)) %>% 
   select(geoid, locality, tract, ends_with("E"))
 
-air <- read_csv("data/airquality_cville_tract.csv") %>% 
+air <- read_csv("data-csv/airquality_cville_tract.csv") %>% 
   mutate(geoid = as.character(gid)) %>% 
   select(geoid, locality = countyfp,
          tract, pm2_5_1981, pm2_5_2016, percentile_1981, percentile_2016,
          pm_change_1981_2016, pctile_change_1981_2016)
 
-cdc <- read_csv("data/cdcplaces_cville_tract.csv") %>% 
+cdc <- read_csv("data-csv/cdcplaces_cville_tract.csv") %>% 
   mutate(geoid = as.character(locationname)) %>% 
-  clean_names() %>% 
-  select(geoid, countyname:annual_checkup2018)
+  select(geoid, countyname, Coronary_Heart_Disease2018:Annual_Checkup2018)
 
-daym <- read_csv("data/daymet_cville_tract.csv") %>% 
+daym <- read_csv("data-csv/daymet_cville_tract.csv") %>% 
   mutate(geoid = as.character(GEOID)) %>% 
   filter(year == 2020) %>% 
   select(geoid, locality = COUNTYFP,
          June_AvgMaxTF:TotpercInch)
 
-fccbb <- read_csv("data/fcc_broadband_cville_tract.csv") %>% 
+fccbb <- read_csv("data-csv/fcc_broadband_cville_tract.csv") %>% 
   mutate(geoid = as.character(tract)) %>% 
   select(geoid, !c(tract, bbmin_dl, bbmin_up))
 
-nri <- read_csv("data/fema_nri_cville_tract.csv") %>% 
+nri <- read_csv("data-csv/fema_nri_cville_tract.csv") %>% 
   mutate(geoid = as.character(TRACTFIPS)) %>% 
   select(geoid, locality = COUNTYFIPS, 
-         BUILDVALUE:AREA, ends_with("AFREQ"), ends_with("HLRB"),
-         ends_with("HLRP"), ends_with("HLRA")) %>% 
-  select(!starts_with("CFLD")) %>% 
-  clean_names()
+         BUILDVALUE:AREA, ends_with("AFREQ")) %>% 
+  select(!starts_with("CFLD")) 
 
-ls8 <- read_csv("data/landsat8_cville_tract.csv") %>% 
+ls8 <- read_csv("data-csv/landsat8_cville_tract.csv") %>% 
   mutate(geoid = as.character(GEOID)) %>% 
   filter(start_date == as.Date("2020-07-04")) %>% 
   select(geoid, min_temp = min, max_temp = max, mean_temp = mean,
          med_temp = median)
 
-lead <- read_csv("data/lead_cville_tract.csv") %>% 
+lead <- read_csv("data-csv/lead_cville_tract.csv") %>% 
   mutate(geoid = as.character(FIP)) %>% 
   select(geoid, locality = county_fip, 
          totalelep:avg_hh_exp, percentburdened,
          percent_burdened_owners, percent_burdened_renters)
 
-lexp <- read_csv("data/leadexposure_cville_tract.csv") %>% 
+lexp <- read_csv("data-csv/leadexposure_cville_tract.csv") %>% 
   mutate(geoid = as.character(GEOID)) %>% 
   select(geoid, locality = countyfips, leadriskscore_raw, lead_risk_rank)
 
-nlcd <- read_csv("data/nlcd_cville_tract.csv") %>% 
+nlcd <- read_csv("data-csv/nlcd_cville_tract.csv") %>% 
   mutate(geoid = as.character(GEOID)) %>% 
   select(geoid, locality = COUNTYFP, 
          tree_can:imp_surf, percent_dev:percent_for)
 
+# Update ACS with new vars added by Lee
+#   also check the commute vars cunder20minE (but need percent?)
 
-# ADD LATER
-# hmda, fema_nfipclaims, fema_nfip, location affordability, lodes_emloyment,
-# lodes_rescoummutepattenrs, lodes_residentcommute, lodes_workercommute
-# food_retail
+# ADD LATER 
+# ejscreen (only blockgroup until aggregated, needs processing)
+# walkability (only blockgroup until aggregated, needs processing), 
+# nfhl (in branch, needs more processing; some tracts missing?), 
+# hmda (need to choose what to aggregate to tract)
+# fema_nfip/policies (need to check; need to choose what to aggregate to tract)
+# location affordability (need to check)
+# lodes: need to determine key vars
+  # lodes_employment, lodes_rescoummutepatterns, 
+  # lodes_residentcommute, lodes_workercommute, 
+# food_retail (maybe as point?) or aggregate/count in tract?
+# noaa for county
 
 
-# Merge data ----
+## ......................................
+# Merge tract data ----
 df <- acs %>% 
-  left_join(air) %>% 
   left_join(cdc) %>% 
+  left_join(air) %>% 
+  left_join(lexp) %>% 
   left_join(daym) %>% 
   left_join(fccbb) %>% 
   left_join(lead) %>% 
-  left_join(lexp) %>% 
   left_join(nlcd) %>% 
+  left_join(ls8) %>% 
   left_join(nri) %>% 
   select(-state)
+
+df <- df %>% 
+  mutate(pop = totalpopE)
+
+# make sure locality name is present (tract, block group?) for labeling
+
+
+## ......................................
+# Add tract metadata ----
+
+# # Clay's code to assign attributes
+# 
+# # combine into one data frame
+# all_data <- bind_rows("County" = county_data_geo, 
+#                       "Block Group" = blkgrp_data_geo, 
+#                       "Census Tract" = tract_data_geo, 
+#                       .id = "GEO_LEVEL")
+# 
+
+# Read in googlesheets info
+#   su_, group (only for selectable), name, source, description
+#   consider adding url for exploration/documentation files?
+
+googlesheets4::gs4_deauth()
+url_sheet <- "https://docs.google.com/spreadsheets/d/1nqm3DuVXD1ObbVe_deacvT7uSLdBXfQJo3mkbqDwrVo/edit?usp=sharing"
+
+pretty_acs <- googlesheets4::read_sheet(url_sheet, sheet = "acs")
+pretty_cdc <- googlesheets4::read_sheet(url_sheet, sheet = "cdc_places")
+pretty_air <- googlesheets4::read_sheet(url_sheet, sheet = "airquality")
+pretty_lex <- googlesheets4::read_sheet(url_sheet, sheet = "lead_exposure")
+pretty_dym <- googlesheets4::read_sheet(url_sheet, sheet = "DAYMET")
+pretty_fcc <- googlesheets4::read_sheet(url_sheet, sheet = "fcc_broadband")
+pretty_leb <- googlesheets4::read_sheet(url_sheet, sheet = "lead")
+pretty_nlc <- googlesheets4::read_sheet(url_sheet, sheet = "nlcd")
+pretty_ls8 <- googlesheets4::read_sheet(url_sheet, sheet = "landsat8")
+pretty_nri <- googlesheets4::read_sheet(url_sheet, sheet = "fema_nri")
+#pretty_wlk <- googlesheets4::read_sheet(url_sheet, sheet = "walkability")
+#pretty_nfh <- googlesheets4::read_sheet(url_sheet, sheet = "nfhl")
+#pretty_ejs <- googlesheets4::read_sheet(url_sheet, sheet = "ejscreen")
+
+pretty <- bind_rows(pretty_acs, pretty_cdc, pretty_air,
+                    pretty_lex, pretty_dym, pretty_fcc,
+                    pretty_leb, pretty_nlc, pretty_ls8,
+                    pretty_nri)
+
+# add pretty metadata to as var attribute: name, source, description
+j <- match(pretty$varname, names(df))
+# remove vars from pretty that don't yet exist in df
+pretty_j <- pretty[(pretty$varname %in% names(df)),]
+j <- match(pretty_j$varname, names(df))
+
+for(i in seq_along(j)){
+  attr(df[[j[i]]], which = "goodname") <- pretty_j$name[i]
+  attr(df[[j[i]]], which = "source") <- pretty_j$source[i]
+  attr(df[[j[i]]], which = "description") <- pretty_j$description[i]
+}
+ 
+df <- df %>% clean_names()
+
+# unique(all_data$GEO_LEVEL)
+# # [1] "County"       "Block Group"  "Census Tract"
+# 
+# # create data frame of group and varnames
+# group_df <- pretty %>%
+#   select(varname, group, name) %>%
+#   filter(!is.na(group))
+# # categories <- unique(group_df$group)
+ 
+# # create indicator lists based on geography
+# # Block group
+# ind_bg <- all_data %>% 
+#   filter(GEO_LEVEL == "Block Group") %>% 
+#   select(group_df$varname) %>% 
+#   map_lgl(~ !all(is.na(.x))) 
+# # census tract
+# ind_ct <- all_data %>% 
+#   filter(GEO_LEVEL == "Census Tract") %>% 
+#   select(group_df$varname) %>% 
+#   map_lgl(~ !all(is.na(.x))) 
+# 
+# # add indicator logicals to group_df and sort
+# # column bg - TRUE if variable available for Block Group
+# # column ct - TRUE if variable available for Census Tract
+# # all vars available for County
+# group_df <- cbind(group_df, bg = ind_bg[-length(ind_bg)], 
+#                   ct = ind_ct[-length(ind_ct)]) %>% 
+#   arrange(group, goodname)
+# 
+# # different lists of available indicators by geo level
+# ind_choices_county <- split(group_df, group_df$group) %>% 
+#   map(function(x)pull(x, varname, name = goodname))
+# 
+# ind_choices_bg <- split(group_df, group_df$group) %>% 
+#   map(function(x)filter(x, bg)) %>% 
+#   map(function(x)pull(x, varname, name = goodname))
+# 
+# ind_choices_ct <- split(group_df, group_df$group) %>% 
+#   map(function(x)filter(x, ct)) %>% 
+#   map(function(x)pull(x, varname, name = goodname))
+# 
+# counties <- levels(factor(tract_data_geo$county.nice))
+
+
+## ......................................
+# Join to geography ----
+tract_shape <- readRDS("data-csv/cville_tracts.RDS") %>% 
+  clean_names() %>% 
+  select(geoid, locality = countyfp, name,
+         geometry)
 
 df_sf <- tract_shape %>% 
   left_join(df) 
 
-# Will need to add easy names and maybe indicator for 
-#   selectable variables vs others
-#   or categories of variables later
 
-
+## ......................................
 # Save Rdata ----
-save(df, df_sf, file = "appideas/cvl_dat.RData")
-# load("appideas/cvl_dat.RData")
+saveRDS(df, file = "appideas/data/cvl_data.RDS")
+saveRDS(df_sf, file = "appideas/data/cvl_data_geo.RDS")
+save(df, df_sf, file = "appideas/data/cvl_dat.RData")
+
+# df <- readRDS("appideas/data/cvl_data.RDS")
 
 
-# # add pop = totalpopE
-# library(tidyverse)
-# 
-# df <- readRDS("appideas/data/cvl_data.Rds")
-# df <- df %>%
-#   mutate(pop = totalpopE)
-# 
-# geo <- readRDS("appideas/data/cvl_data_geo.Rds")
-# geo <- geo %>%
-#   mutate(pop = totalpopE)
-# 
-# saveRDS(df, file = "appideas/cvl_data.Rds")
-# saveRDS(geo, file = "appideas/cvl_data_geo.Rds")
-# save(df, geo, file = "appideas/cvl_dat.RData")
+# Add indices at tract (or county) level?
+# AHDI, dissimilarty, interaction, isolation?
