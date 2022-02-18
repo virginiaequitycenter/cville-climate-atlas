@@ -1,11 +1,12 @@
 library(tidyverse)
 library(plotly)
+library(leaflet)
 
 df <- readRDS("appideas/data/cvl_data.RDS")
 
 
 # In parts
-xhist <- plot_ly(data = df, x = ~percentile_2016, type = 'histogram', 
+xhist <- plot_ly(data = df, x = ~tree_can, type = 'histogram', 
                  nbinsx = 20, alpha =.75, color = I("grey")) %>% 
   layout(yaxis = list(showgrid = FALSE,
                       showticklabels = FALSE),
@@ -32,7 +33,7 @@ xyscatter <- plot_ly(data = df,
          legend = list(orientation = "h", x = 0, y = -0.2))
 xyscatter
 
-yhist <- plot_ly(data = df, y = ~current_asthma2018, type = 'histogram', 
+yhist <- plot_ly(data = df, y = ~whiteE, type = 'histogram', 
                  nbinsx = 20, alpha = .75, color = I("grey")) %>% 
   layout(xaxis = list(showgrid = FALSE,
                       showticklabels = FALSE),
@@ -95,10 +96,12 @@ legend_ <- ggplot() +
   theme(axis.title = element_text(size = 6), axis.title.y = element_text(angle = 90))
 ggsave(plot = legend_, filename = 'appideas/www/bivariate_legend_static.svg', width = 1, height = 1)
 
+# make diagonals of legend for sidebar?
+
 
 tmp <- df %>%
-  dplyr::filter(locality %in% c("540", "003", "065")) %>% 
-  dplyr::select(x = totalpopE,
+  #dplyr::filter(locality %in% c("540", "003", "065")) %>% 
+  dplyr::select(x = tree_can,
                 y = whiteE,
                 locality = locality, 
                 tract = tract,
@@ -107,8 +110,8 @@ tmp <- df %>%
 
 geo2 <- geo %>% select(geoid, geometry)
 
-to_map <- left_join(tmp, geo2, by = "geoid")
-to_map <- bi_class(tmp, x = x, y = y, style = "quantile", dim = 3)
+to_map <- left_join(geo2, tmp, by = "geoid")
+to_map <- bi_class(to_map, x = x, y = y, style = "quantile", dim = 3)
 to_map <- st_transform(st_as_sf(to_map), 4326)
 factpal <- colorFactor(bipal, domain = to_map$bi_class)
 
@@ -128,5 +131,8 @@ leaflet() %>%
               highlight = highlightOptions(
                 weight = 2,
                 fillOpacity = 0.8,
-                bringToFront = T))
+                bringToFront = T)) %>% 
+  #setView(lng = mean(geo_df$Longitude), lat = mean(geo_df$Latitude), zoom = 12) 
+  setView(lng = -78.47668, lat = 38.02931, zoom = 9)
 
+  

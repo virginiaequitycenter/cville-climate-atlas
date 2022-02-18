@@ -85,16 +85,15 @@ ui <- navbarPage("Regional Climate Equity Atlas",
              # Place figures
              column(8, 
                     tabsetPanel(type = "tabs",
-                      tabPanel(title = "Scatterplot",
-                               plotlyOutput(outputId = "scatterplot")
-                      ),
-                      tabPanel('Map', leafletOutput(outputId = 'leaf', width = '100%'),
-                               div(style="text-align:center",
-                                   img(src = "bivariate_legend_static.svg", height='200', class = "bg", align="center"))
-                               ),
-                      tabPanel(title = "Terciles")
-                    )
-             ),
+                                tabPanel('Map', actionButton("rend_map", "Render map"), 
+                                         leafletOutput(outputId = 'leaf', width = '100%')
+                                ),
+                                tabPanel(title = "Scatterplot",
+                                         plotlyOutput(outputId = "scatterplot")
+                                         ),
+                                tabPanel(title = "Terciles")
+                                )
+                    ),
              
              # Sidebar for indicator 2
              column(2,
@@ -135,7 +134,9 @@ ui <- navbarPage("Regional Climate Equity Atlas",
            
            ),
   tabPanel("Documentation"),
-  tabPanel("About")
+  tabPanel("About"),
+  
+  singleton(tags$head(tags$script(src = "message-handler.js")))
   
 )
 
@@ -201,37 +202,47 @@ server <- function(input, output) {
     
   })
   
-  # output map; rebuild when input variables are updated
+  # build static parts of map, and display initial outline of region
   output$leaf <- renderLeaflet({
-    
-    # create biclass
-    to_map <- left_join(geo_data(), data(), by = c('locality',  'geoid'))
-    to_map <- bi_class(to_map, x = x, y = y, style = "quantile", dim = 3)
-    to_map <- st_transform(st_as_sf(to_map), 4326)
-    factpal <- colorFactor(bipal, domain = to_map$bi_class)
-    
-    leaflet() %>%
-      addProviderTiles(input$base_map) %>%
-      
-      addPolygons(data = to_map,
-                  fillColor = ~factpal(bi_class),
-                  weight = 1,
-                  opacity = 1,
-                  color = "white",
-                  fillOpacity = 0.8,
-                  highlight = highlightOptions(
-                    weight = 2,
+    leaflet() %>% addProviderTiles(input$base_map) %>%
+      addPolygons(data = geo_data(), color = 'grey', opacity = 0) %>%
+      setView(lng = -78.47668, lat = 38.02931, zoom = 9) %>% 
+      addLogo('bivariate_legend.svg', src = "remote",
+              position = "topleft", width = 100, height = 100, alpha = 0.8)
+  })
+  
+  # when variables are selected and "Render map" is pressed, render the bichoropleth without losing the legend
+  observeEvent(input$rend_map, {
+    # `if()` check below will be expanded to check for all map-breaking variables
+    if (input$indicator1 %in% 'indigE' | input$indicator2 %in% 'indigE') {
+      session$sendCustomMessage(type = 'testmessage',
+                                message = "One of your selected variables cannot be rendered in the choropleth (map); this is usually because there isn't enough variation in the variable to break its values up into meaningful categories")
+    } else {
+      to_map <- left_join(geo_data(), data(), by = c('locality',  'geoid'))
+      to_map <- bi_class(to_map, x = x, y = y, style = "quantile", dim = 3)
+      to_map <- st_transform(st_as_sf(to_map), 4326)
+      factpal <- colorFactor(bipal, domain = to_map$bi_class)
+      leafletProxy('leaf', data = to_map) %>% clearShapes() %>%
+        addPolygons(data = to_map,
+                    fillColor = ~factpal(bi_class),
+                    weight = 1,
+                    opacity = 1,
+                    color = "white",
                     fillOpacity = 0.8,
-                    bringToFront = T),
-                  popup = paste0(input$indicator1, ": ", data()$x,  "<br>",
-                                 input$indicator2, ": ", data()$y, "<br>",
-                                 paste0(data()$locality, ", ", data()$tract))
-                  )
+                    highlight = highlightOptions(
+                      weight = 2,
+                      fillOpacity = 0.8,
+                      bringToFront = T),
+                    popup = paste0(input$indicator1, ": ", data()$x,  "<br>",
+                                   input$indicator2, ": ", data()$y, "<br>",
+                                   paste0(data()$locality, ", ", data()$tract))
+                    )
+    }
   })
   
   
-  # indicator 1 info
-  output$ind1_name <- renderText({
+# indicator 1 info
+output$ind1_name <- renderText({
     input$indicator1
 #    attr(md()[[input$indicator1]], "goodname")
   })
