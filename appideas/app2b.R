@@ -245,8 +245,8 @@ server <- function(input, output, session) {
                     popup = paste0(input$indicator1, ": ", data()$x,  "<br>",
                                    input$indicator2, ": ", data()$y, "<br>",
                                    paste0(data()$locality, ", ", data()$tract), "<br>",
-                                   'Variable 1 tercile: ', to_map$var1_tercile, "<br>",
-                                   'Variable 2 tercile: ', to_map$var2_tercile)
+                                   input$indicator1, ' category (1-3): ', to_map$var1_tercile, "<br>",
+                                   input$indicator2, ' category (1-3): ', to_map$var2_tercile)
                     )
     }
   })
