@@ -18,18 +18,12 @@
 # Phase 3: output for tercile graph
 
 # To do
-#    add varname improvements: (add meta as attribute to data)
-#       locality/tract names (in selector, in hover, in popup)
-#       good var names (in selector, in hover, in popup)
-#       reactive variable definitions below var selector
-#       ?figure title/captions/information?
-
-# To do
+#    update meta (short description on front, notes on new tab)
 #    add block group data and selector for geography (in fluid row 2)
-#    get header logo/image; customize theming/color/aesthetic elements
-#    add documentation info, about info; come up with better header image
+#    get better header logo/image; customize theming/color/aesthetic elements
+#    add documentation info, about info, front page narrative for interpretation?;
 #    select and add all variables (update google sheet, meta)
-#    ?add county or block level?
+#    ?add county or block level data?
 #    ?add component-wise helper information?
 # consider pulling out/chunking up and source some stuff...programming improvements
 
