@@ -8,11 +8,11 @@
 # Phase 1a: select indicators, output plotly scatterplot, add sample header
 #    to do: look into line.width warnings (and no trace specified warnings)
 # Phase 1b: select localities to plot, add tabs for other components, add navbar
-#    to do? add select/unselect all button
 
-# Phase 2a: integrate bichoropleth; add base map selector
-#    to do: settle on legend solution
-#    to do: can we make it default to zoom further in?
+# Phase 2a: integrate bichoropleth; add base map selector; 
+# Phase 2b: add popup info, fix legend! add setview to force zoom;
+#    replace locality fips with names, replace varnames with good names,
+#    add variable descriptions to sidebar
 #    to do? add layering points (parks, schools, food retailers)
 
 # Phase 3: output for tercile graph
@@ -45,10 +45,12 @@ library(sf)
 library(leafem)
 library(stringi)
 
-df <- readRDS("data/cvl_data.RDS")
-geo <- readRDS('data/cvl_data_geo.RDS') %>% select(locality, geoid, geometry) %>% st_transform(4326)
-varlist <- df %>% select(where(is.numeric), -pop) %>% names()
-# cvl_data.RDS and cvl_data_geo.RDS prepared in combine_data.R
+load("data/cvl_dat.RData")
+# data prepared in combine_data.R
+# geo <- geo %>% select(locality, geoid, geometry) 
+
+# df <- readRDS("data/cvl_data.RDS")
+# varlist <- df %>% select(where(is.numeric), -pop) %>% names()
 
 # create palette for use in bichoropleth palette function
 bipal <- c("#e8e8e8", "#dfd0d6", "#be64ac", # A-1, A-2, A-3,
@@ -60,7 +62,7 @@ bipal <- c("#e8e8e8", "#dfd0d6", "#be64ac", # A-1, A-2, A-3,
 # Define User Interface ----
 ui <- navbarPage("Regional Climate Equity Atlas",
 
-  # start initial tab: indicator selectors and main plot
+  ## indicator selectors and plots ----
   tabPanel("Main",
            # App title ----
            titlePanel(div(
@@ -76,8 +78,8 @@ ui <- navbarPage("Regional Climate Equity Atlas",
              column(2,
                     selectInput(inputId = "indicator1",
                                 label = h4("Select Variable 1 (X)"),
-                                choices = varlist,
-                                selected = varlist[1]),
+                                choices = ind_choices_ct,
+                                selected = ind_choices_ct$`Demographic & Social`["Estimated Population"]),
                     # variable definitions
                     strong(textOutput("ind1_name")),
                     textOutput("ind1_defn")
@@ -100,8 +102,8 @@ ui <- navbarPage("Regional Climate Equity Atlas",
              column(2,
                     selectInput(inputId = "indicator2",
                                 label = h4("Select Variable 2 (Y)"),
-                                choices = varlist,
-                                selected = varlist[2]),
+                                choices = ind_choices_ct,
+                                selected = ind_choices_ct$`Jobs & Income`["Median Household Income"]),
                     # variable definitions
                     strong(textOutput("ind2_name")),
                     textOutput("ind2_defn")
@@ -110,30 +112,38 @@ ui <- navbarPage("Regional Climate Equity Atlas",
 
            tags$hr(),
 
-           # start second row: county selector (geography selector; base map selector)
+           ## county/map/geography selector ----
            fluidRow(
-
-             column(4,
-                    checkboxGroupInput(inputId = "locality",
-                                       label = h4("Select Localities"),
-                                       choices = unique(df$locality),
-                                       selected = unique(df$locality),
-                                       inline = TRUE)
-             ),
-
-            # base map selector
-             column(4,
+             
+             # base map selector
+             column(3,
                     radioButtons(inputId = "base_map",
                                  label = h4("Select a Base Map"),
                                  choices = c("Minimal" = "CartoDB.Positron",
                                              "Detailed" = "OpenStreetMap.Mapnik"),
                                  inline = TRUE)
+             ),
+             
+             # locality selector
+             column(5,
+                    checkboxGroupInput(inputId = "locality",
+                                       label = h4("Select Localities"),
+                                       choices = c("Albemarle" = "003", 
+                                                   "Charlottesvile" = "540",
+                                                   "Fluvanna" = "065",
+                                                   "Greene" = "079",
+                                                   "Lousia" = "109",
+                                                   "Nelson" = "125"),
+                                       selected = c("003", "540", "065",
+                                                    "079", "109", "125"),
+                                       inline = TRUE)
              )
-
 
            )
 
            ),
+  
+  ## information navbars ----
   tabPanel("Documentation"),
   tabPanel("About"),
 
@@ -146,52 +156,57 @@ ui <- navbarPage("Regional Climate Equity Atlas",
 # Define Server Logic ----
 server <- function(input, output, session) {
 
-  # define data
-  data <- reactive({
-    df <- df %>%
+  ## define data ----
+  # data <- reactive({
+  #   df <- df %>%
+  #     dplyr::select(x = !!sym(input$indicator1),
+  #                   y = !!sym(input$indicator2),
+  #                   locality, countyname, tract, geoid,
+  #                   pop = pop) %>%
+  #     dplyr::filter(locality %in% input$locality)
+  # })
+
+  geo_data <- reactive({
+    geo <- geo %>%
       dplyr::select(x = !!sym(input$indicator1),
                     y = !!sym(input$indicator2),
-                    locality, tract, geoid,
+                    locality, countyname, tract, geoid,
                     pop = pop) %>%
       dplyr::filter(locality %in% input$locality)
   })
 
-  geo_data <- reactive({
-    geo <- geo %>%
-      dplyr::filter(locality %in% input$locality)
-  })
-
-  # output scatterplot
+  ## output scatterplot ----
   output$scatterplot <- renderPlotly({
-
-    xhist <- plot_ly(data = data(), x = ~x,
+    
+    d <- st_drop_geometry(geo_data())
+    xhist <- plot_ly(data = d, x = ~x,
                      type = "histogram", nbinsx = 20,
                      alpha =.75, color = I("grey")) %>%
       layout(yaxis = list(showgrid = FALSE,
                           showticklabels = FALSE),
              xaxis = list(showticklabels = FALSE))
 
-    yhist <- plot_ly(data = data(), y = ~y,
+    yhist <- plot_ly(data = d, y = ~y,
                      type = "histogram", nbinsx = 20,
                      alpha = .75, color = I("grey")) %>%
       layout(xaxis = list(showgrid = FALSE,
-                          showticklabels = FALSE),
+                          showticklabels = TRUE),
              yaxis = list(showticklabels = FALSE))
 
-    xyscatter <- plot_ly(data = data(), x = ~x, y = ~y,
+    xyscatter <- plot_ly(data = d, x = ~x, y = ~y,
                          type = "scatter",
                          mode = "markers",
                          size = ~pop, sizes = c(1, 500),
-                         color = ~locality, colors = "Dark2",
+                         color = ~countyname, colors = "Dark2",
                          alpha = .75,
-                         text = paste0("County: ", data()$locality, "<br>",
-                                       "Census tract: ", data()$tract, "<br>",
-                                       "Population: ", data()$pop, "<br>",
-                                       input$indicator1, ": ", data()$x, "<br>",
-                                       input$indicator2, ": ", data()$y, "<br>"),
+                         text = paste0("Locality: ", d$countyname, "<br>",
+                                       "Census tract: ", d$tract, "<br>",
+                                       "Population: ", d$pop, "<br>",
+                                       attr(d$x, "goodname"), ": ", d$x, "<br>",
+                                       attr(d$y, "goodname"), ": ", d$y, "<br>"),
                          hoverinfo = "text") %>%
-      layout(xaxis = list(title = input$indicator1),
-             yaxis = list(title = input$indicator2),
+      layout(xaxis = list(title = attr(d$x, "goodname"), showticklabels = TRUE),
+             yaxis = list(title = attr(d$y, "goodname"), showticklabels = TRUE),
              legend = list(orientation = "h", x = 0, y = -0.2))
 
     subplot(xhist, plotly_empty(), xyscatter, yhist,
@@ -203,7 +218,8 @@ server <- function(input, output, session) {
 
   })
 
-  # build static parts of map, and display initial outline of region
+  ## output map ----
+  #build static parts of map, and display initial outline of region
   output$leaf <- renderLeaflet({
     leaflet() %>% addProviderTiles(input$base_map) %>%
       addPolygons(data = geo, color = 'grey', opacity = 0) %>%
@@ -225,8 +241,9 @@ server <- function(input, output, session) {
                                                  " there isn't enough variation in the variable",
                                                  " to break its values up into meaningful categories"))
     } else {
-      to_map <- left_join(geo_data(), data(), by = c('locality',  'geoid'))
-      to_map <- bi_class(to_map, x = x, y = y, style = "quantile", dim = 3)
+      # to_map <- left_join(geo_data(), data(), by = c('locality',  'geoid'))
+      # to_map <- merge(data(), geo_data(), by = 'geoid')
+      to_map <- bi_class(geo_data(), x = x, y = y, style = "quantile", dim = 3)
       to_map <- st_transform(st_as_sf(to_map), 4326)
       to_map$var1_tercile <- stri_extract(to_map$bi_class, regex = '^\\d{1}(?=-\\d)')
       to_map$var2_tercile <- stri_extract(to_map$bi_class, regex = '(?<=\\d-)\\d{1}$')
@@ -242,38 +259,33 @@ server <- function(input, output, session) {
                       weight = 2,
                       fillOpacity = 0.8,
                       bringToFront = T),
-                    popup = paste0(input$indicator1, ": ", data()$x,  "<br>",
-                                   input$indicator2, ": ", data()$y, "<br>",
-                                   paste0(data()$locality, ", ", data()$tract), "<br>",
-                                   input$indicator1, ' category (1-3): ', to_map$var1_tercile, "<br>",
-                                   input$indicator2, ' category (1-3): ', to_map$var2_tercile)
-                    )
+                    popup = paste0("Locality: ", to_map$countyname, ", ", to_map$tract, "<br>",
+                                   attr(to_map$x, "goodname"), ": ", to_map$x,  "<br>",
+                                   " ", "category (1-3): ", to_map$var1_tercile, "<br>",
+                                   attr(to_map$y, "goodname"), ": ", to_map$y, "<br>",
+                                   " ", "category (1-3): ", to_map$var2_tercile))
     }
   })
 
-
+## indicator info ----
 # indicator 1 info
 output$ind1_name <- renderText({
-    input$indicator1
-#    attr(md()[[input$indicator1]], "goodname")
+    attr(geo_data()$x, "goodname")
   })
 
   # output indicator 1 description, for Source & Definition box
   output$ind1_defn <- renderText({
-    "add me"
-#    attr(md()[[input$indicator1]], "about")
+    attr(geo_data()$x, "description")
   })
 
   # indicator 2 info
   output$ind2_name <- renderText({
-    input$indicator2
-#    attr(md()[[input$indicator2]], "goodname")
+    attr(geo_data()$y, "goodname")
   })
 
   # output indicator 2 description, for Source & Definition box
   output$ind2_defn <- renderText({
-    "add me"
-#    attr(md()[[input$indicator2]], "about")
+    attr(geo_data()$y, "description")
   })
 
 }

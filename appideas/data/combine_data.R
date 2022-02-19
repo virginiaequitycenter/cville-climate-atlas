@@ -11,8 +11,8 @@
 # Setup ----
 
 library(tidyverse)
-library(janitor)
 library(sf)
+library(janitor)
 
 
 ## ......................................
@@ -113,20 +113,9 @@ df <- acs %>%
 df <- df %>% 
   mutate(pop = totalpopE)
 
-# make sure locality name is present (tract, block group?) for labeling
-
 
 ## ......................................
 # Add tract metadata ----
-
-# # Clay's code to assign attributes
-# 
-# # combine into one data frame
-# all_data <- bind_rows("County" = county_data_geo, 
-#                       "Block Group" = blkgrp_data_geo, 
-#                       "Census Tract" = tract_data_geo, 
-#                       .id = "GEO_LEVEL")
-# 
 
 # Read in googlesheets info
 #   su_, group (only for selectable), name, source, description
@@ -154,6 +143,7 @@ pretty <- bind_rows(pretty_acs, pretty_cdc, pretty_air,
                     pretty_leb, pretty_nlc, pretty_ls8,
                     pretty_nri)
 
+# Adapt Clay's code to assign attributes
 # add pretty metadata to as var attribute: name, source, description
 j <- match(pretty$varname, names(df))
 # remove vars from pretty that don't yet exist in df
@@ -166,50 +156,28 @@ for(i in seq_along(j)){
   attr(df[[j[i]]], which = "description") <- pretty_j$description[i]
 }
  
-df <- df %>% clean_names()
+# create data frame of group and varnames
+group_df <- pretty_j %>%
+  select(varname, group, name) %>%
+  filter(!is.na(group))
 
-# unique(all_data$GEO_LEVEL)
-# # [1] "County"       "Block Group"  "Census Tract"
-# 
-# # create data frame of group and varnames
-# group_df <- pretty %>%
-#   select(varname, group, name) %>%
-#   filter(!is.na(group))
-# # categories <- unique(group_df$group)
- 
-# # create indicator lists based on geography
-# # Block group
-# ind_bg <- all_data %>% 
-#   filter(GEO_LEVEL == "Block Group") %>% 
-#   select(group_df$varname) %>% 
-#   map_lgl(~ !all(is.na(.x))) 
-# # census tract
-# ind_ct <- all_data %>% 
-#   filter(GEO_LEVEL == "Census Tract") %>% 
-#   select(group_df$varname) %>% 
-#   map_lgl(~ !all(is.na(.x))) 
-# 
-# # add indicator logicals to group_df and sort
-# # column bg - TRUE if variable available for Block Group
-# # column ct - TRUE if variable available for Census Tract
-# # all vars available for County
-# group_df <- cbind(group_df, bg = ind_bg[-length(ind_bg)], 
-#                   ct = ind_ct[-length(ind_ct)]) %>% 
-#   arrange(group, goodname)
-# 
-# # different lists of available indicators by geo level
-# ind_choices_county <- split(group_df, group_df$group) %>% 
-#   map(function(x)pull(x, varname, name = goodname))
-# 
-# ind_choices_bg <- split(group_df, group_df$group) %>% 
-#   map(function(x)filter(x, bg)) %>% 
-#   map(function(x)pull(x, varname, name = goodname))
-# 
-# ind_choices_ct <- split(group_df, group_df$group) %>% 
-#   map(function(x)filter(x, ct)) %>% 
-#   map(function(x)pull(x, varname, name = goodname))
-# 
-# counties <- levels(factor(tract_data_geo$county.nice))
+ind_ct <- df %>%
+  #filter(GEO_LEVEL == "Census Tract") %>%
+  select(group_df$varname) %>%
+  map_lgl(~ !all(is.na(.x)))
+
+# add indicator logicals to group_df and sort
+# column bg - TRUE if variable available for Block Group
+# column ct - TRUE if variable available for Census Tract
+# all vars available for County
+group_df <- cbind(group_df, #bg = ind_bg[-length(ind_bg)],
+                  ct = ind_ct) %>% 
+                  #ct = ind_ct[-length(ind_ct)]) %>%
+  arrange(group, name)
+
+ind_choices_ct <- split(group_df, group_df$group) %>%
+  map(function(x)filter(x, ct)) %>%
+  map(function(x)pull(x, varname, name))
 
 
 ## ......................................
@@ -219,15 +187,17 @@ tract_shape <- readRDS("data-csv/cville_tracts.RDS") %>%
   select(geoid, locality = countyfp, name,
          geometry)
 
-df_sf <- tract_shape %>% 
+geo <- tract_shape %>% 
   left_join(df) 
+
+geo <- st_transform(geo, crs = 4326)
 
 
 ## ......................................
 # Save Rdata ----
 saveRDS(df, file = "appideas/data/cvl_data.RDS")
-saveRDS(df_sf, file = "appideas/data/cvl_data_geo.RDS")
-save(df, df_sf, file = "appideas/data/cvl_dat.RData")
+saveRDS(geo, file = "appideas/data/cvl_data_geo.RDS")
+save(df, geo, ind_choices_ct, group_df, file = "appideas/data/cvl_dat.RData")
 
 # df <- readRDS("appideas/data/cvl_data.RDS")
 

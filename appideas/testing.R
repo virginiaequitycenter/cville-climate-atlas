@@ -2,7 +2,7 @@ library(tidyverse)
 library(plotly)
 library(leaflet)
 
-df <- readRDS("appideas/data/cvl_data.RDS")
+df <- readRDS("data/cvl_data.RDS")
 
 
 # In parts
@@ -13,32 +13,32 @@ xhist <- plot_ly(data = df, x = ~tree_can, type = 'histogram',
          xaxis = list(showticklabels = FALSE))
 xhist
 
-xyscatter <- plot_ly(data = df, 
-                     x = ~percentile_2016, 
-                     y = ~current_asthma2018, 
-                     type = 'scatter',
-                     size = ~totalpopE, 
-                     sizes = c(1, 500),
-                     color = ~locality, 
-                     colors = "Dark2", 
-                     alpha = .75,
-                     text = paste0("County: ", df$locality, "<br>",
-                                   "Population: ", df$totalpopE, "<br>",
-                                   "Census tract: ", df$tract, "<br>",
-                                   "X: ", df$percentile_2016, "<br>",
-                                   "Y: ", df$current_asthma2018, "<br>"),
-                     hoverinfo = "text") %>% 
-  layout(xaxis = list(title = "PM2.5 Percentile, 2016"),
-         yaxis = list(title = "Percent with Asthma"),
-         legend = list(orientation = "h", x = 0, y = -0.2))
-xyscatter
-
 yhist <- plot_ly(data = df, y = ~whiteE, type = 'histogram', 
                  nbinsx = 20, alpha = .75, color = I("grey")) %>% 
   layout(xaxis = list(showgrid = FALSE,
                       showticklabels = FALSE),
-         yaxis = list(showticklabels = FALSE))
+         yaxis = list(showticklabels = TRUE))
 yhist
+
+xyscatter <- plot_ly(data = df, 
+                     x = ~tree_can, 
+                     y = ~whiteE, 
+                     type = 'scatter',
+                     size = ~totalpopE, 
+                     sizes = c(1, 500),
+                     color = ~countyname, 
+                     colors = "Dark2", 
+                     alpha = .75,
+                     text = paste0("County: ", df$countyname, "<br>",
+                                   "Population: ", df$totalpopE, "<br>",
+                                   "Census tract: ", df$tract, "<br>",
+                                   "X: ", df$tree_can, "<br>",
+                                   "Y: ", df$whiteE, "<br>"),
+                     hoverinfo = "text") %>% 
+  layout(xaxis = list(title = "Tree Canopy", showticklabels = TRUE),
+         yaxis = list(title = "Percent White", showtickLabels = TRUE),
+         legend = list(orientation = "h", x = 0, y = -0.2))
+xyscatter
 
 subplot(xhist, plotly_empty(), xyscatter, yhist,
         nrows = 2, heights = c(.2, .8), widths = c(.8,.2), margin = 0,
@@ -68,8 +68,9 @@ library(sf)
 library(leaflet)
 library(leafem)
 library(biscale)
+library(stringi)
 
-geo <- readRDS("appideas/data/cvl_data_geo.RDS")
+geo <- readRDS("data/cvl_data_geo.RDS")
 
 varlist <- geo %>% select(where(is.numeric), -pop) %>% names()
 
@@ -100,20 +101,48 @@ ggsave(plot = legend_, filename = 'appideas/www/bivariate_legend_static.svg', wi
 
 
 tmp <- df %>%
-  #dplyr::filter(locality %in% c("540", "003", "065")) %>% 
   dplyr::select(x = tree_can,
                 y = whiteE,
-                locality = locality, 
-                tract = tract,
-                pop = pop,
-                geoid = geoid)
+                locality, countyname, tract, geoid,
+                pop = pop) %>% 
+  dplyr::filter(locality %in% c("540", "003", "065", "079", "109", "125"))
 
-geo2 <- geo %>% select(geoid, geometry)
+geo2 <- geo %>% select(locality, geoid, geometry)
 
-to_map <- left_join(geo2, tmp, by = "geoid")
+# to_map <- left_join(geo2, tmp, by = "geoid")
+# to_map <- bi_class(to_map, x = x, y = y, style = "quantile", dim = 3)
+# to_map <- st_transform(st_as_sf(to_map), 4326)
+# factpal <- colorFactor(bipal, domain = to_map$bi_class)
+
+to_map <- merge(tmp, geo2, by = 'geoid')
 to_map <- bi_class(to_map, x = x, y = y, style = "quantile", dim = 3)
 to_map <- st_transform(st_as_sf(to_map), 4326)
+to_map$var1_tercile <- stri_extract(to_map$bi_class, regex = '^\\d{1}(?=-\\d)')
+to_map$var2_tercile <- stri_extract(to_map$bi_class, regex = '(?<=\\d-)\\d{1}$')
 factpal <- colorFactor(bipal, domain = to_map$bi_class)
+
+leaflet() %>% addProviderTiles("CartoDB.Positron") %>%
+  addPolygons(data = geo2, color = 'grey', opacity = 0) %>%
+  setView(lng = -78.47668, lat = 38.02931, zoom = 9) %>%
+  addLogo('bivariate_legend_static.svg', src = "remote",
+          position = "topleft", width = 100, height = 100, alpha = 0.8) %>% 
+
+  addPolygons(data = to_map,
+              fillColor = ~factpal(bi_class),
+              weight = 1,
+              opacity = 1,
+              color = "white",
+              fillOpacity = 0.8,
+              highlight = highlightOptions(
+                weight = 2,
+                fillOpacity = 0.8,
+                bringToFront = T),
+              popup = paste0("Locality: ", to_map$countyname, ", ", to_map$tract, "<br>",
+                             attr(to_map$x, "goodname"), ": ", to_map$x,  "<br>",
+                             " ", "category (1-3): ", to_map$var1_tercile, "<br>",
+                             attr(to_map$y, "goodname"), ": ", to_map$y, "<br>",
+                             " ", "category (1-3): ", to_map$var2_tercile))
+
 
 leaflet() %>%
   addProviderTiles("CartoDB.Positron") %>%
