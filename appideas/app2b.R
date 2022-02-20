@@ -2,14 +2,14 @@
 # Begin Climate Equity Atlas Development
 # Authors: Michele Claibourn, others
 # Updated: February 5, 2022
+#          2022-02-20 jacob-gg
 # ....................................
-
 
 # Phase 1a: select indicators, output plotly scatterplot, add sample header
 #    to do: look into line.width warnings (and no trace specified warnings)
 # Phase 1b: select localities to plot, add tabs for other components, add navbar
 
-# Phase 2a: integrate bichoropleth; add base map selector; 
+# Phase 2a: integrate bichoropleth; add base map selector;
 # Phase 2b: add popup info, fix legend! add setview to force zoom;
 #    replace locality fips with names, replace varnames with good names,
 #    add variable descriptions to sidebar
@@ -41,7 +41,7 @@ library(stringi)
 
 load("data/cvl_dat.RData")
 # data prepared in combine_data.R
-# geo <- geo %>% select(locality, geoid, geometry) 
+# geo <- geo %>% select(locality, geoid, geometry)
 
 # df <- readRDS("data/cvl_data.RDS")
 # varlist <- df %>% select(where(is.numeric), -pop) %>% names()
@@ -51,6 +51,8 @@ bipal <- c("#e8e8e8", "#dfd0d6", "#be64ac", # A-1, A-2, A-3,
            "#ace4e4", "#a5add3", "#8c62aa", # B-1, B-2, B-3
            "#5ac8c8", "#5698b9", "#3b4994") # C-1, C-2, C-3
 
+# no-go variables for mapping
+cant_map <- c('indigE', 'othraceE', 'bbmax_up', 'HWAV_AFREQ', 'RFLD_AFREQ')
 
 # ....................................
 # Define User Interface ----
@@ -108,7 +110,7 @@ ui <- navbarPage("Regional Climate Equity Atlas",
 
            ## county/map/geography selector ----
            fluidRow(
-             
+
              # base map selector
              column(3,
                     radioButtons(inputId = "base_map",
@@ -117,12 +119,12 @@ ui <- navbarPage("Regional Climate Equity Atlas",
                                              "Detailed" = "OpenStreetMap.Mapnik"),
                                  inline = TRUE)
              ),
-             
+
              # locality selector
              column(5,
                     checkboxGroupInput(inputId = "locality",
                                        label = h4("Select Localities"),
-                                       choices = c("Albemarle" = "003", 
+                                       choices = c("Albemarle" = "003",
                                                    "Charlottesvile" = "540",
                                                    "Fluvanna" = "065",
                                                    "Greene" = "079",
@@ -136,7 +138,7 @@ ui <- navbarPage("Regional Climate Equity Atlas",
            )
 
            ),
-  
+
   ## information navbars ----
   tabPanel("Documentation"),
   tabPanel("About"),
@@ -171,7 +173,7 @@ server <- function(input, output, session) {
 
   ## output scatterplot ----
   output$scatterplot <- renderPlotly({
-    
+
     d <- st_drop_geometry(geo_data())
     xhist <- plot_ly(data = d, x = ~x,
                      type = "histogram", nbinsx = 20,
@@ -228,7 +230,7 @@ server <- function(input, output, session) {
   # when a variable or locality selection is changed, render the appropriate bichoropleth without losing the legend
   observeEvent(listen_closely(), {
     # `if()` check below will be expanded to check for all map-breaking variables
-    if (input$indicator1 %in% 'indigE' | input$indicator2 %in% 'indigE') {
+    if (input$indicator1 %in% cant_map | input$indicator2 %in% cant_map) {
       session$sendCustomMessage(type = 'testmessage',
                                 message = paste0("One of your selected variables cannot be",
                                                  " rendered in the map. This is usually because",
@@ -238,9 +240,12 @@ server <- function(input, output, session) {
       # to_map <- left_join(geo_data(), data(), by = c('locality',  'geoid'))
       # to_map <- merge(data(), geo_data(), by = 'geoid')
       to_map <- bi_class(geo_data(), x = x, y = y, style = "quantile", dim = 3)
-      to_map <- st_transform(st_as_sf(to_map), 4326)
+      to_map <- st_transform(st_as_sf(to_map), 4326) # still necessary? Can maybe delete if 4326 is established in earlier data prep
       to_map$var1_tercile <- stri_extract(to_map$bi_class, regex = '^\\d{1}(?=-\\d)')
+      to_map$var1_tercile_cat <- ifelse(to_map$var1_tercile == 1, 'Low', ifelse(to_map$var1_tercile == 2, 'Medium', ifelse(to_map$var1_tercile == 3, 'High', '')))
       to_map$var2_tercile <- stri_extract(to_map$bi_class, regex = '(?<=\\d-)\\d{1}$')
+      to_map$var2_tercile_cat <- ifelse(to_map$var2_tercile == 1, 'Low', ifelse(to_map$var2_tercile == 2, 'Medium', ifelse(to_map$var2_tercile == 3, 'High', '')))
+
       factpal <- colorFactor(bipal, domain = to_map$bi_class)
       leafletProxy('leaf', data = to_map) %>% clearShapes() %>%
         addPolygons(data = to_map,
@@ -255,9 +260,9 @@ server <- function(input, output, session) {
                       bringToFront = T),
                     popup = paste0("Locality: ", to_map$countyname, ", ", to_map$tract, "<br>",
                                    attr(to_map$x, "goodname"), ": ", to_map$x,  "<br>",
-                                   " ", "category (1-3): ", to_map$var1_tercile, "<br>",
+                                   "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Relative to other tracts: ", to_map$var1_tercile_cat, "<br>",
                                    attr(to_map$y, "goodname"), ": ", to_map$y, "<br>",
-                                   " ", "category (1-3): ", to_map$var2_tercile))
+                                   "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Relative to other tracts: ", to_map$var2_tercile_cat))
     }
   })
 
