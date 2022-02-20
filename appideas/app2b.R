@@ -99,7 +99,8 @@ ui <- navbarPage("Regional Climate Equity Atlas",
                                          plotlyOutput(outputId = "scatterplot")
                                          ),
                                 tabPanel(title = "Terciles",
-                                          plotOutput(outputId = 'tercile_plot'),
+                                          plotOutput(outputId = 'tercile_plot')
+                                         ),
                                 tabPanel(title = "Variable Information",
                                          strong(textOutput("var1_name")),
                                          textOutput("var1_abt"),
@@ -163,6 +164,7 @@ ui <- navbarPage("Regional Climate Equity Atlas",
 
   singleton(tags$head(tags$script(src = "message-handler.js")))
 )
+
 
 
 # ....................................
@@ -297,7 +299,7 @@ output$ind1_defn <- renderText({
 
 # output indicator 1 source
 output$ind1_source <- renderText({
-  attr(geo_data()$x, "source")
+  paste("Source: ", attr(geo_data()$x, "source"))
 })
 
 # output indicator 2 description
@@ -307,7 +309,7 @@ output$ind2_defn <- renderText({
 
 # output indicator 2 description
 output$ind2_source <- renderText({
-  attr(geo_data()$y, "source")
+  paste("Source: ", attr(geo_data()$y, "source"))
 })
 
 # detailed var info
@@ -320,7 +322,7 @@ output$var1_abt <- renderText({
 })
 
 output$var1_source <- renderText({
-  attr(geo_data()$x, "source")
+  paste("Source: ", attr(geo_data()$x, "source"))
 })
 
 output$var2_name <- renderText({
@@ -332,8 +334,9 @@ output$var2_abt <- renderText({
 })
 
 output$var2_source <- renderText({
-  attr(geo_data()$y, "source")
+  paste("Source: ", attr(geo_data()$y, "source"))
 })
 
+}
 # Run the application ----
 shinyApp(ui = ui, server = server)
