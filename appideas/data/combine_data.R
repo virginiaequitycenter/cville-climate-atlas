@@ -154,6 +154,7 @@ for(i in seq_along(j)){
   attr(df[[j[i]]], which = "goodname") <- pretty_j$name[i]
   attr(df[[j[i]]], which = "source") <- pretty_j$source[i]
   attr(df[[j[i]]], which = "description") <- pretty_j$description[i]
+  attr(df[[j[i]]], which = "about") <- pretty_j$notes[i]
 }
  
 # create data frame of group and varnames
@@ -172,6 +173,11 @@ ind_ct <- df %>%
 # all vars available for County
 group_df <- cbind(group_df, #bg = ind_bg[-length(ind_bg)],
                   ct = ind_ct) %>% 
+  mutate(group = factor(group, levels = c("Demographic & Social", 
+                                          "Health", "Youth & Educaton", 
+                                          "Jobs & Income", "Climate Measures", 
+                                          "Community Assets & Infrastructure", 
+                                          "Risk Factors"))) %>% 
                   #ct = ind_ct[-length(ind_ct)]) %>%
   arrange(group, name)
 

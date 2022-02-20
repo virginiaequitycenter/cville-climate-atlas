@@ -77,8 +77,9 @@ ui <- navbarPage("Regional Climate Equity Atlas",
                                 choices = ind_choices_ct,
                                 selected = ind_choices_ct$`Demographic & Social`["Estimated Population"]),
                     # variable definitions
-                    strong(textOutput("ind1_name")),
-                    textOutput("ind1_defn")
+                    textOutput("ind1_defn"),                    
+                    textOutput("ind1_source")
+
              ),
 
              # Place figures
@@ -90,7 +91,15 @@ ui <- navbarPage("Regional Climate Equity Atlas",
                                 tabPanel(title = "Scatterplot",
                                          plotlyOutput(outputId = "scatterplot")
                                          ),
-                                tabPanel(title = "Terciles")
+                                tabPanel(title = "Terciles"),
+                                tabPanel(title = "Variable Information",
+                                         strong(textOutput("var1_name")), 
+                                         textOutput("var1_abt"),
+                                         textOutput("var1_source"),
+                                         tags$br(),
+                                         strong(textOutput("var2_name")), 
+                                         textOutput("var2_abt"),
+                                         textOutput("var2_source"))
                                 )
                     ),
 
@@ -101,8 +110,9 @@ ui <- navbarPage("Regional Climate Equity Atlas",
                                 choices = ind_choices_ct,
                                 selected = ind_choices_ct$`Jobs & Income`["Median Household Income"]),
                     # variable definitions
-                    strong(textOutput("ind2_name")),
-                    textOutput("ind2_defn")
+                    textOutput("ind2_defn"),
+                    textOutput("ind2_source")
+                    
              )
            ),
 
@@ -268,26 +278,53 @@ server <- function(input, output, session) {
 
 ## indicator info ----
 # indicator 1 info
-output$ind1_name <- renderText({
-    attr(geo_data()$x, "goodname")
-  })
 
-  # output indicator 1 description, for Source & Definition box
+    # output indicator 1 description
   output$ind1_defn <- renderText({
     attr(geo_data()$x, "description")
   })
 
-  # indicator 2 info
-  output$ind2_name <- renderText({
-    attr(geo_data()$y, "goodname")
+  # output indicator 1 source
+  output$ind1_source <- renderText({
+    attr(geo_data()$x, "source")
   })
 
-  # output indicator 2 description, for Source & Definition box
+  # output indicator 2 description
   output$ind2_defn <- renderText({
     attr(geo_data()$y, "description")
   })
 
-}
+  # output indicator 2 description
+  output$ind2_source <- renderText({
+    attr(geo_data()$y, "source")
+  })
+
+  # detailed var info
+  output$var1_name <- renderText({
+    attr(geo_data()$x, "goodname")
+  })
+  
+  output$var1_abt <- renderText({
+    attr(geo_data()$x, "about")
+  })
+
+  output$var1_source <- renderText({
+    attr(geo_data()$x, "source")
+  })
+
+  output$var2_name <- renderText({
+    attr(geo_data()$y, "goodname")
+  })
+  
+  output$var2_abt <- renderText({
+    attr(geo_data()$y, "about")
+  })
+  
+  output$var2_source <- renderText({
+    attr(geo_data()$y, "source")
+  })
+  
+  }
 
 
 # Run the application ----
