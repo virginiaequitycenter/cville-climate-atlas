@@ -99,7 +99,7 @@ ui <- navbarPage("Regional Climate Equity Atlas",
                                          plotlyOutput(outputId = "scatterplot")
                                          ),
                                 tabPanel(title = "Terciles",
-                                          plotOutput(outputId = 'tercile_plot')
+                                         plotlyOutput(outputId = 'tercile_plot')
                                          ),
                                 tabPanel(title = "Variable Information",
                                          strong(textOutput("var1_name")),
@@ -181,7 +181,8 @@ server <- function(input, output, session) {
                     y = !!sym(input$indicator2),
                     locality, countyname, tract, geoid,
                     pop = pop) %>%
-      dplyr::filter(locality %in% input$locality)
+      dplyr::filter(locality %in% input$locality) %>% 
+      drop_na()
     }
   })
 
@@ -277,42 +278,59 @@ server <- function(input, output, session) {
   })
 
   ## output tercile plot ----
-  output$tercile_plot <- renderPlot({
+  output$tercile_plot <- renderPlotly({
     if (input$indicator1 %in% cant_map | input$indicator2 %in% cant_map | input$indicator1 == input$indicator2) {
       ""
     } else {
+
       to_tercile <- bi_class(geo_data(), x = x, y = y, style = "quantile", dim = 3)
       to_tercile$var1_tercile <- stri_extract(to_tercile$bi_class, regex = '^\\d{1}(?=-\\d)')
-      to_tercile <- to_tercile %>% group_by(var1_tercile) %>% summarize(var2_mean = mean(y, na.rm = T))
-      to_tercile <- to_tercile[to_tercile$var1_tercile %in% 1:3, ]
-      ggplot(to_tercile, aes(x = var1_tercile, y = var2_mean, fill = var1_tercile)) +
-        geom_bar(stat = 'identity') + scale_fill_manual(values = c('cornflowerblue', 'salmon', 'darkolivegreen3')) +
+      to_tercile$`Var 1 Group` <- ifelse(to_tercile$var1_tercile == 1, 'Low', ifelse(to_tercile$var1_tercile == 2, 'Medium', ifelse(to_tercile$var1_tercile == 3, 'High', '')))
+      to_tercile <- to_tercile %>% group_by(var1_tercile) %>% 
+        mutate(`Var 2 Mean` = mean(y, na.rm = T)) %>% 
+        slice(1)
+      # to_tercile <- to_tercile[to_tercile$var1_tercile %in% 1:3, ]
+
+      t <- ggplot(to_tercile, aes(x = var1_tercile, y = `Var 2 Mean`, 
+                                  fill = var1_tercile, label = `Var 1 Group`)) +
+        geom_bar(stat = 'identity') +
+        scale_fill_manual(values = c('#dfb0d6', '#a5add3', '#569ab9')) +
         scale_x_discrete(labels = paste0(c('Lowest ', 'Middle ', 'Highest '), 'third of tracts')) +
-        theme(legend.position = 'none')
+        labs(x = attr(to_tercile$x, "goodname"), 
+             y = attr(to_tercile$y, "goodname")) +
+        #theme(legend.position = 'none') +
+        theme_minimal()
+      
+      ggplotly(t, tooltip = c("label", "y")) %>%
+        layout(showlegend = FALSE)
+      
     }
   })
 
-  # output indicator 1 description
+  ## output variable information ----
+  
+  # by selector
+  # indicator 1
 output$ind1_defn <- renderText({
   attr(geo_data()$x, "description")
 })
 
-# output indicator 1 source
 output$ind1_source <- renderText({
   paste("Source: ", attr(geo_data()$x, "source"))
 })
 
-# output indicator 2 description
+# indicator 2 
 output$ind2_defn <- renderText({
   attr(geo_data()$y, "description")
 })
 
-# output indicator 2 description
+# indicator 2 description by selector
 output$ind2_source <- renderText({
   paste("Source: ", attr(geo_data()$y, "source"))
 })
 
-# detailed var info
+# detailed var info on var info tab
+# indicator 1
 output$var1_name <- renderText({
   attr(geo_data()$x, "goodname")
 })
@@ -325,6 +343,7 @@ output$var1_source <- renderText({
   paste("Source: ", attr(geo_data()$x, "source"))
 })
 
+# indicator 2
 output$var2_name <- renderText({
   attr(geo_data()$y, "goodname")
 })
