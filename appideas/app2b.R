@@ -2,12 +2,11 @@
 # Begin Climate Equity Atlas Development
 # Authors: Michele Claibourn, others
 # Updated: February 5, 2022
-#          2022-02-20 jacob-gg
+#          2022-02-21 jacob-gg
 # ....................................
 
-# some remaining issues (2022-02-20):
+# some remaining issues (2022-02-21):
 #   in the scatterplot, when a locality is turned off, it's replaced in the plotly legend by "trace [n]"
-#   in the tercile plot, the x and y labels aren't the clean names (trying the "goodnames" attribute didn't happen to work for me)
 #   this warning appears every time the app is run, although it's unclear if whatever it refers to is a real issue for us:
 #         "Warning in classInt::classIntervals(bins_y, n = dim, style = "quantile"): var has missing values, omitted in finding classes"
 
@@ -182,7 +181,7 @@ server <- function(input, output, session) {
                     y = !!sym(input$indicator2),
                     locality, countyname, tract, geoid,
                     pop = pop) %>%
-      dplyr::filter(locality %in% input$locality) %>% 
+      dplyr::filter(locality %in% input$locality) %>%
       drop_na()
     }
   })
@@ -281,35 +280,31 @@ server <- function(input, output, session) {
   ## output tercile plot ----
   output$tercile_plot <- renderPlotly({
     if (input$indicator1 %in% cant_map | input$indicator2 %in% cant_map | input$indicator1 == input$indicator2) {
-      ""
+      plotly_empty()
     } else {
-
       to_tercile <- bi_class(geo_data(), x = x, y = y, style = "quantile", dim = 3)
       to_tercile$var1_tercile <- stri_extract(to_tercile$bi_class, regex = '^\\d{1}(?=-\\d)')
-      to_tercile$`Var 1 Group` <- ifelse(to_tercile$var1_tercile == 1, 'Low', ifelse(to_tercile$var1_tercile == 2, 'Middle', ifelse(to_tercile$var1_tercile == 3, 'High', '')))
-      to_tercile <- to_tercile %>% group_by(var1_tercile) %>% 
-        mutate(`Var 2 Mean` = mean(y, na.rm = T)) %>% 
-        slice(1)
-      # to_tercile <- to_tercile[to_tercile$var1_tercile %in% 1:3, ]
 
-      t <- ggplot(to_tercile, aes(x = var1_tercile, y = `Var 2 Mean`, 
-                                  fill = var1_tercile, label = `Var 1 Group`)) +
+      to_tercile$`Var 1 Group` <- ifelse(to_tercile$var1_tercile == 1, 'Low', ifelse(to_tercile$var1_tercile == 2, 'Medium', ifelse(to_tercile$var1_tercile == 3, 'High', '')))
+      to_tercile <- to_tercile %>% group_by(var1_tercile) %>% mutate(`Var 2 Mean` = mean(y, na.rm = T)) %>% slice(1)
+      t <- ggplot(to_tercile, aes(x = var1_tercile, y = `Var 2 Mean`,
+                                  fill = var1_tercile, label = `Var 1 Group`,
+                                  text = paste0('Mean of ', attr(to_tercile$y, "goodname"), ': ', round(`Var 2 Mean`, digits = 3)))) +
         geom_bar(stat = 'identity') +
         scale_fill_manual(values = c('#dfb0d6', '#a5add3', '#569ab9')) +
         scale_x_discrete(labels = paste0(c('Lowest ', 'Middle ', 'Highest '), 'third of tracts')) +
-        labs(x = attr(to_tercile$x, "goodname"), 
+        labs(x = attr(to_tercile$x, "goodname"),
              y = attr(to_tercile$y, "goodname")) +
-        #theme(legend.position = 'none') +
         theme_minimal()
-      
-      ggplotly(t, tooltip = c("label", "y")) %>%
+
+      ggplotly(t, tooltip = c('text')) %>%
         layout(showlegend = FALSE, yaxis = list(side = "right"))
       
     }
   })
 
   ## output variable information ----
-  
+
   # by selector
   # indicator 1
 output$ind1_defn <- renderText({
@@ -320,7 +315,7 @@ output$ind1_source <- renderText({
   paste("Source: ", attr(geo_data()$x, "source"))
 })
 
-# indicator 2 
+# indicator 2
 output$ind2_defn <- renderText({
   attr(geo_data()$y, "description")
 })
