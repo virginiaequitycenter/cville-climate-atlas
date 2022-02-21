@@ -2,7 +2,7 @@
 # Begin Climate Equity Atlas Development
 # Authors: Michele Claibourn, Jacob Goldstein-Greenwood, Lee LeBoeuf
 # Updated: February 5, 2022
-#          2022-02-20 jacob-gg, mpc
+#          2022-02-21 jacob-gg, mpc
 # ....................................
 
 # some remaining issues (2022-02-20):
@@ -95,14 +95,14 @@ ui <- navbarPage("Regional Climate Equity Atlas",
                     tabsetPanel(type = "tabs",
                                 tabPanel(title = 'Map', align = 'center',
                                          leafletOutput(outputId = 'leaf', width = '100%')
-                                         ),
-                                tabPanel(title = "Scatterplot",
+                                ),
+                                tabPanel(title = "Correlation",
                                          plotlyOutput(outputId = "scatterplot")
-                                         ),
-                                tabPanel(title = "Terciles",
-                                          plotOutput(outputId = 'tercile_plot')
-                                         ),
-                                tabPanel(title = "Variable Information",
+                                ),
+                                tabPanel(title = "Differences",
+                                         plotlyOutput(outputId = 'tercile_plot')
+                                ),
+                                tabPanel(title = "Variable Details",
                                          strong(textOutput("var1_name")),
                                          textOutput("var1_abt"),
                                          textOutput("var1_source"),
@@ -110,8 +110,8 @@ ui <- navbarPage("Regional Climate Equity Atlas",
                                          strong(textOutput("var2_name")),
                                          textOutput("var2_abt"),
                                          textOutput("var2_source"))
-                                )
-                    ),
+                    )
+             ),
 
              # Sidebar for indicator 2
              column(2,
@@ -182,7 +182,8 @@ server <- function(input, output, session) {
                     y = !!sym(input$indicator2),
                     locality, countyname, tract, geoid,
                     pop = pop) %>%
-      dplyr::filter(locality %in% input$locality)
+      dplyr::filter(locality %in% input$locality) %>% 
+      drop_na()
     }
   })
 
@@ -278,18 +279,30 @@ server <- function(input, output, session) {
   })
 
   ## output tercile plot ----
-  output$tercile_plot <- renderPlot({
+  output$tercile_plot <- renderPlotly({
     if (input$indicator1 %in% cant_map | input$indicator2 %in% cant_map | input$indicator1 == input$indicator2) {
       ""
     } else {
       to_tercile <- bi_class(geo_data(), x = x, y = y, style = "quantile", dim = 3)
       to_tercile$var1_tercile <- stri_extract(to_tercile$bi_class, regex = '^\\d{1}(?=-\\d)')
-      to_tercile <- to_tercile %>% group_by(var1_tercile) %>% summarize(var2_mean = mean(y, na.rm = T))
-      to_tercile <- to_tercile[to_tercile$var1_tercile %in% 1:3, ]
-      ggplot(to_tercile, aes(x = var1_tercile, y = var2_mean, fill = var1_tercile)) +
-        geom_bar(stat = 'identity') + scale_fill_manual(values = c('cornflowerblue', 'salmon', 'darkolivegreen3')) +
+      to_tercile$`Var 1 Group` <- ifelse(to_tercile$var1_tercile == 1, 'Low', ifelse(to_tercile$var1_tercile == 2, 'Middle', ifelse(to_tercile$var1_tercile == 3, 'High', '')))
+      to_tercile <- to_tercile %>% group_by(var1_tercile) %>% 
+        mutate(`Var 2 Mean` = mean(y, na.rm = T)) %>% 
+        slice(1)
+      # to_tercile <- to_tercile[to_tercile$var1_tercile %in% 1:3, ]
+      
+      t <- ggplot(to_tercile, aes(x = var1_tercile, y = `Var 2 Mean`, 
+                                  fill = var1_tercile, label = `Var 1 Group`)) +
+        geom_bar(stat = 'identity') +
+        scale_fill_manual(values = c('#dfb0d6', '#a5add3', '#569ab9')) +
         scale_x_discrete(labels = paste0(c('Lowest ', 'Middle ', 'Highest '), 'third of tracts')) +
-        theme(legend.position = 'none')
+        labs(x = attr(to_tercile$x, "goodname"), 
+             y = attr(to_tercile$y, "goodname")) +
+        #theme(legend.position = 'none') +
+        theme_minimal()
+      
+      ggplotly(t, tooltip = c("label", "y")) %>%
+        layout(showlegend = FALSE, yaxis = list(side = "right"))
     }
   })
 

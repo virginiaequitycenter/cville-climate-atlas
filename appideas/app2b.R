@@ -11,26 +11,27 @@
 #   this warning appears every time the app is run, although it's unclear if whatever it refers to is a real issue for us:
 #         "Warning in classInt::classIntervals(bins_y, n = dim, style = "quantile"): var has missing values, omitted in finding classes"
 
-# Phase 1a: select indicators, output plotly scatterplot, add sample header
+# Phase 1a: added select indicators, output plotly scatterplot, add sample header
 #    to do: look into line.width warnings (and no trace specified warnings)
-# Phase 1b: select localities to plot, add tabs for other components, add navbar
+# Phase 1b: added select localities to plot, add tabs for other components, add navbar
 
-# Phase 2a: integrate bichoropleth; add base map selector;
-# Phase 2b: add popup info, fix legend! add setview to force zoom;
-#    replace locality fips with names, replace varnames with good names,
-#    add variable descriptions to sidebar
-#    to do? add layering points (parks, schools, food retailers)
-
-# Phase 3: output for tercile graph
+# Phase 2a: integrated bichoropleth; add base map selector;
+# Phase 2b: added popup info, fixed legend! added setview to force zoom;
+#    replaced locality fips with names, replace varnames with good names,
+#    added variable descriptions to sidebar
+#    updated meta (short description on front, notes on new tab)
+# initial output for tercile graph!
 
 # To do
-#    update meta (short description on front, notes on new tab)
-#    add block group data and selector for geography (in fluid row 2)
-#    get better header logo/image; customize theming/color/aesthetic elements
 #    add documentation info, about info, front page narrative for interpretation?;
-#    select and add all variables (update google sheet, meta)
+#    check/add additional variables
+#    add short instructional bits for each element?
+#    get better header logo/image; customize theming/color/aesthetic elements
+#    ?add layering points (parks, schools, food retailers)
+#    ?add block group data and selector for geography (in fluid row 2)
 #    ?add county or block level data?
 #    ?add component-wise helper information?
+
 # consider pulling out/chunking up and source some stuff...programming improvements
 
 
@@ -95,13 +96,13 @@ ui <- navbarPage("Regional Climate Equity Atlas",
                                 tabPanel(title = 'Map', align = 'center',
                                          leafletOutput(outputId = 'leaf', width = '100%')
                                          ),
-                                tabPanel(title = "Scatterplot",
+                                tabPanel(title = "Correlation",
                                          plotlyOutput(outputId = "scatterplot")
                                          ),
-                                tabPanel(title = "Terciles",
+                                tabPanel(title = "Differences",
                                          plotlyOutput(outputId = 'tercile_plot')
                                          ),
-                                tabPanel(title = "Variable Information",
+                                tabPanel(title = "Variable Details",
                                          strong(textOutput("var1_name")),
                                          textOutput("var1_abt"),
                                          textOutput("var1_source"),
@@ -285,7 +286,7 @@ server <- function(input, output, session) {
 
       to_tercile <- bi_class(geo_data(), x = x, y = y, style = "quantile", dim = 3)
       to_tercile$var1_tercile <- stri_extract(to_tercile$bi_class, regex = '^\\d{1}(?=-\\d)')
-      to_tercile$`Var 1 Group` <- ifelse(to_tercile$var1_tercile == 1, 'Low', ifelse(to_tercile$var1_tercile == 2, 'Medium', ifelse(to_tercile$var1_tercile == 3, 'High', '')))
+      to_tercile$`Var 1 Group` <- ifelse(to_tercile$var1_tercile == 1, 'Low', ifelse(to_tercile$var1_tercile == 2, 'Middle', ifelse(to_tercile$var1_tercile == 3, 'High', '')))
       to_tercile <- to_tercile %>% group_by(var1_tercile) %>% 
         mutate(`Var 2 Mean` = mean(y, na.rm = T)) %>% 
         slice(1)
@@ -302,7 +303,7 @@ server <- function(input, output, session) {
         theme_minimal()
       
       ggplotly(t, tooltip = c("label", "y")) %>%
-        layout(showlegend = FALSE)
+        layout(showlegend = FALSE, yaxis = list(side = "right"))
       
     }
   })

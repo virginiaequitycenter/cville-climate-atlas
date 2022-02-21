@@ -194,11 +194,12 @@ t <- ggplot(to_tercile, aes(x = var1_tercile, y = `Var 2 Mean`, fill = var1_terc
   geom_bar(stat = 'identity') + 
   scale_fill_manual(values = c('#dfb0d6', '#a5add3', '#569ab9')) +
   scale_x_discrete(labels = paste0(c('Lowest ', 'Middle ', 'Highest '), 'third of tracts')) +
+  # scale_y_continuous(position = "right") +
   labs(x = attr(to_tercile$x, "goodname"), 
        y = attr(to_tercile$y, "goodname")) +
   # theme(legend.position = "none") +
   theme_minimal()
 
 ggplotly(t, tooltip = c("label", "y")) %>% 
-  layout(showlegend = FALSE)
+  layout(showlegend = FALSE, yaxis = list(side = "right"))
   
