@@ -148,7 +148,7 @@ ui <- navbarPage("Regional Climate Equity Atlas",
                                                    "Charlottesvile" = "540",
                                                    "Fluvanna" = "065",
                                                    "Greene" = "079",
-                                                   "Lousia" = "109",
+                                                   "Louisa" = "109",
                                                    "Nelson" = "125"),
                                        selected = c("003", "540", "065",
                                                     "079", "109", "125"),
@@ -291,8 +291,9 @@ server <- function(input, output, session) {
         slice(1)
       # to_tercile <- to_tercile[to_tercile$var1_tercile %in% 1:3, ]
       
-      t <- ggplot(to_tercile, aes(x = var1_tercile, y = `Var 2 Mean`, 
-                                  fill = var1_tercile, label = `Var 1 Group`)) +
+      t <- ggplot(to_tercile, aes(x = var1_tercile, y = `Var 2 Mean`,
+                                  fill = var1_tercile, label = `Var 1 Group`,
+                                  text = paste0('Mean of ', attr(to_tercile$y, "goodname"), ': ', round(`Var 2 Mean`, digits = 3)))) +
         geom_bar(stat = 'identity') +
         scale_fill_manual(values = c('#dfb0d6', '#a5add3', '#569ab9')) +
         scale_x_discrete(labels = paste0(c('Lowest ', 'Middle ', 'Highest '), 'third of tracts')) +
@@ -301,7 +302,7 @@ server <- function(input, output, session) {
         #theme(legend.position = 'none') +
         theme_minimal()
       
-      ggplotly(t, tooltip = c("label", "y")) %>%
+      ggplotly(t, tooltip = c('text')) %>%
         layout(showlegend = FALSE, yaxis = list(side = "right"))
     }
   })
