@@ -2,7 +2,7 @@
 # Begin Climate Equity Atlas Development
 # Authors: Michele Claibourn, others
 # Updated: February 5, 2022
-#          2022-02-21 jacob-gg
+#          2022-02-23 jacob-gg
 # ....................................
 
 # some remaining issues (2022-02-21):
@@ -175,6 +175,9 @@ server <- function(input, output, session) {
     if (input$indicator1 == input$indicator2) {
       session$sendCustomMessage(type = 'testmessage',
                                 message = paste0("Please make sure that you've selected two different variables."))
+    } else if (length(input$locality) == 0) {
+      session$sendCustomMessage(type = 'testmessage',
+                                message = paste0("At least one locality must be selected."))
     } else {
     geo <- geo %>%
       dplyr::select(x = !!sym(input$indicator1),
@@ -188,7 +191,7 @@ server <- function(input, output, session) {
 
   ## output scatterplot ----
   output$scatterplot <- renderPlotly({
-    if (input$indicator1 == input$indicator2) {
+    if (input$indicator1 == input$indicator2 | length(input$locality) == 0) {
       plotly_empty()
     } else {
       d <- st_drop_geometry(geo_data())
@@ -246,7 +249,7 @@ server <- function(input, output, session) {
   })
   # when a variable or locality selection is changed, render the appropriate bichoropleth without losing the legend
   observeEvent(listen_closely(), {
-    if (input$indicator1 == input$indicator2) {
+    if (input$indicator1 == input$indicator2 | length(input$locality) == 0) {
       leafletProxy('leaf') %>% clearShapes()
     } else if (input$indicator1 %in% cant_map | input$indicator2 %in% cant_map) {
       session$sendCustomMessage(type = 'testmessage', message = cant_map_message)
@@ -279,7 +282,7 @@ server <- function(input, output, session) {
 
   ## output tercile plot ----
   output$tercile_plot <- renderPlotly({
-    if (input$indicator1 %in% cant_map | input$indicator2 %in% cant_map | input$indicator1 == input$indicator2) {
+    if (input$indicator1 %in% cant_map | input$indicator2 %in% cant_map | input$indicator1 == input$indicator2 | length(input$locality) == 0) {
       plotly_empty()
     } else {
       to_tercile <- bi_class(geo_data(), x = x, y = y, style = "quantile", dim = 3)
@@ -299,7 +302,7 @@ server <- function(input, output, session) {
 
       ggplotly(t, tooltip = c('text')) %>%
         layout(showlegend = FALSE, yaxis = list(side = "right"))
-      
+
     }
   })
 
