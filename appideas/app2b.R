@@ -2,13 +2,8 @@
 # Begin Climate Equity Atlas Development
 # Authors: Michele Claibourn, others
 # Updated: February 5, 2022
-#          2022-02-23 jacob-gg
+#          2022-02-24 jacob-gg
 # ....................................
-
-# some remaining issues (2022-02-21):
-#   in the scatterplot, when a locality is turned off, it's replaced in the plotly legend by "trace [n]"
-#   this warning appears every time the app is run, although it's unclear if whatever it refers to is a real issue for us:
-#         "Warning in classInt::classIntervals(bins_y, n = dim, style = "quantile"): var has missing values, omitted in finding classes"
 
 # Phase 1a: added select indicators, output plotly scatterplot, add sample header
 #    to do: look into line.width warnings (and no trace specified warnings)
@@ -225,10 +220,13 @@ server <- function(input, output, session) {
                yaxis = list(title = attr(d$y, "goodname"), showticklabels = TRUE),
                legend = list(orientation = "h", x = 0, y = -0.2))
 
+      # note: in the legend, we hide trace 1 (the xhist) and trace (3 + length(input$locality)), which is the yhist;
+      #       the yhist's trace # changes as a user selects different localities to map, but it can be dynamically
+      #       referenced as... yhist trace number = 1 (xhist) + 1 (plotly_empty) + n_localities + 1 (to reach the yhist)
       subplot(xhist, plotly_empty(), xyscatter, yhist,
               nrows = 2, heights = c(.2, .8), widths = c(.8,.2), margin = 0,
               shareX = TRUE, shareY = TRUE) %>%
-        style(showlegend = FALSE, traces = c(1,9)) %>%  # remove hist symbols from legend
+        style(showlegend = FALSE, traces = c(1, sum(3 + length(input$locality)))) %>%
         layout(xaxis = list(showgrid = TRUE),
                yaxis2 = list(showgrid = TRUE))
     }
