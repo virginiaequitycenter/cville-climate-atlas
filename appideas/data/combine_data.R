@@ -83,9 +83,6 @@ nlcd <- read_csv("data-csv/nlcd_cville_tract.csv") %>%
   select(geoid, locality = COUNTYFP, 
          tree_can:imp_surf, percent_dev:percent_for)
 
-# Update ACS with new vars added by Lee
-#   also check the commute vars cunder20minE (but need percent?)
-
 # ADD LATER 
 # ejscreen (only blockgroup until aggregated, needs processing)
 # walkability (only blockgroup until aggregated, needs processing), 
@@ -177,17 +174,39 @@ ind_ct <- df %>%
 # column bg - TRUE if variable available for Block Group
 # column ct - TRUE if variable available for Census Tract
 # all vars available for County
-group_df <- cbind(group_df, #bg = ind_bg[-length(ind_bg)],
+group_df_dem <- cbind(group_df, #bg = ind_bg[-length(ind_bg)],
                   ct = ind_ct) %>% 
   mutate(group = factor(group, levels = c("Demographic & Social", 
-                                          "Health", "Youth & Educaton", 
-                                          "Jobs & Income", "Climate Measures", 
+                                          "Health", 
+                                          "Youth & Educaton", 
+                                          "Jobs & Income", 
+                                          "Housing & Transportation",
+                                          "Risk Factors",
                                           "Community Assets & Infrastructure", 
-                                          "Risk Factors"))) %>% 
+                                          "Climate Measures")
+                        )) %>% 
                   #ct = ind_ct[-length(ind_ct)]) %>%
   arrange(group, name)
 
-ind_choices_ct <- split(group_df, group_df$group) %>%
+ind_demfirst_ct <- split(group_df_dem, group_df_dem$group) %>%
+  map(function(x)filter(x, ct)) %>%
+  map(function(x)pull(x, varname, name))
+
+group_df_clim <- cbind(group_df, #bg = ind_bg[-length(ind_bg)],
+                      ct = ind_ct) %>% 
+  mutate(group = factor(group, levels = c("Climate Measures", 
+                                          "Community Assets & Infrastructure", 
+                                          "Risk Factors", 
+                                          "Housing & Transportation",
+                                          "Jobs & Income",
+                                          "Youth & Educaton", 
+                                          "Health", 
+                                          "Demographic & Social")
+                        )) %>% 
+  #ct = ind_ct[-length(ind_ct)]) %>%
+  arrange(group, name)
+
+ind_climfirst_ct <- split(group_df_clim, group_df_clim$group) %>%
   map(function(x)filter(x, ct)) %>%
   map(function(x)pull(x, varname, name))
 
@@ -209,9 +228,9 @@ geo <- st_transform(geo, crs = 4326)
 # Save Rdata ----
 saveRDS(df, file = "appideas/data/cvl_data.RDS")
 saveRDS(geo, file = "appideas/data/cvl_data_geo.RDS")
-save(df, geo, ind_choices_ct, group_df, file = "appideas/data/cvl_dat.RData")
-
-# df <- readRDS("appideas/data/cvl_data.RDS")
+save(df, geo, group_df_dem, group_df_clim, 
+     ind_demfirst_ct, ind_climfirst_ct, 
+     file = "appideas/data/cvl_dat.RData")
 
 
 # Add indices at tract (or county) level?

@@ -76,8 +76,8 @@ ui <- navbarPage("Regional Climate Equity Atlas",
              column(2,
                     selectInput(inputId = "indicator1",
                                 label = h4("Select Variable 1 (X)"),
-                                choices = ind_choices_ct,
-                                selected = ind_choices_ct$`Demographic & Social`["Estimated Population"]),
+                                choices = ind_demfirst_ct,
+                                selected = ind_demfirst_ct$`Demographic & Social`["Estimated Population"]),
                     # variable definitions
                     textOutput("ind1_defn"),
                     textOutput("ind1_source")
@@ -111,8 +111,8 @@ ui <- navbarPage("Regional Climate Equity Atlas",
              column(2,
                     selectInput(inputId = "indicator2",
                                 label = h4("Select Variable 2 (Y)"),
-                                choices = ind_choices_ct,
-                                selected = ind_choices_ct$`Jobs & Income`["Median Household Income"]),
+                                choices = ind_climfirst_ct,
+                                selected = ind_climfirst_ct$`Jobs & Income`["Maximum Land Surface Temperature"]),
                     # variable definitions
                     textOutput("ind2_defn"),
                     textOutput("ind2_source")
