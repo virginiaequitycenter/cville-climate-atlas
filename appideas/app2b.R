@@ -2,7 +2,7 @@
 # Begin Climate Equity Atlas Development
 # Authors: Michele Claibourn, others
 # Updated: February 5, 2022
-#          2022-02-24 jacob-gg
+#          2022-02-25 mpc, jacob-gg
 # ....................................
 
 # Phase 1a: added select indicators, output plotly scatterplot, add sample header
@@ -112,7 +112,7 @@ ui <- navbarPage("Regional Climate Equity Atlas",
                     selectInput(inputId = "indicator2",
                                 label = h4("Select Variable 2 (Y)"),
                                 choices = ind_climfirst_ct,
-                                selected = ind_climfirst_ct$`Jobs & Income`["Maximum Land Surface Temperature"]),
+                                selected = ind_climfirst_ct$`Climate Measures`["Average Land Surface Temperature"]),
                     # variable definitions
                     textOutput("ind2_defn"),
                     textOutput("ind2_source")

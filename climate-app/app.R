@@ -1,15 +1,9 @@
 # ....................................
 # Begin Climate Equity Atlas Development
-# Authors: Michele Claibourn, Jacob Goldstein-Greenwood, Lee LeBoeuf
+# Authors: Michele Claibourn, others
 # Updated: February 5, 2022
-#          2022-02-21 jacob-gg, mpc
+#          2022-02-25 mpc, jacob-gg
 # ....................................
-
-# some remaining issues (2022-02-20):
-#   in the scatterplot, when a locality is turned off, it's replaced in the plotly legend by "trace [n]"
-#   in the tercile plot, the x and y labels aren't the clean names (trying the "goodnames" attribute didn't happen to work for me)
-#   this warning appears every time the app is run, although it's unclear if whatever it refers to is a real issue for us:
-#         "Warning in classInt::classIntervals(bins_y, n = dim, style = "quantile"): var has missing values, omitted in finding classes"
 
 # Phase 1a: added select indicators, output plotly scatterplot, add sample header
 #    to do: look into line.width warnings (and no trace specified warnings)
@@ -65,105 +59,105 @@ cant_map_message <- c("One of your selected variables cannot be rendered in the 
 # ....................................
 # Define User Interface ----
 ui <- navbarPage("Regional Climate Equity Atlas",
-
-  ## indicator selectors and plots ----
-  tabPanel("Main",
-           # App title ----
-           titlePanel(div(
-             windowTitle = "Cville Climate Equity Atlas",
-             img(src = "ec_climate_logo.png", height='200', class = "bg"),
-           )),
-
-           tags$br(),
-
-           fluidRow(
-
-             # Sidebar for indicator 1
-             column(2,
-                    selectInput(inputId = "indicator1",
-                                label = h4("Select Variable 1 (X)"),
-                                choices = ind_choices_ct,
-                                selected = ind_choices_ct$`Demographic & Social`["Estimated Population"]),
-                    # variable definitions
-                    textOutput("ind1_defn"),
-                    textOutput("ind1_source")
-
-             ),
-
-             # Place figures
-             column(8,
-                    tabsetPanel(type = "tabs",
-                                tabPanel(title = 'Map', align = 'center',
-                                         leafletOutput(outputId = 'leaf', width = '100%')
-                                ),
-                                tabPanel(title = "Correlation",
-                                         plotlyOutput(outputId = "scatterplot")
-                                ),
-                                tabPanel(title = "Differences",
-                                         plotlyOutput(outputId = 'tercile_plot')
-                                ),
-                                tabPanel(title = "Variable Details",
-                                         strong(textOutput("var1_name")),
-                                         textOutput("var1_abt"),
-                                         textOutput("var1_source"),
-                                         tags$br(),
-                                         strong(textOutput("var2_name")),
-                                         textOutput("var2_abt"),
-                                         textOutput("var2_source"))
-                    )
-             ),
-
-             # Sidebar for indicator 2
-             column(2,
-                    selectInput(inputId = "indicator2",
-                                label = h4("Select Variable 2 (Y)"),
-                                choices = ind_choices_ct,
-                                selected = ind_choices_ct$`Jobs & Income`["Median Household Income"]),
-                    # variable definitions
-                    textOutput("ind2_defn"),
-                    textOutput("ind2_source")
-
-             )
-           ),
-
-           tags$hr(),
-
-           ## county/map/geography selector ----
-           fluidRow(
-
-             # base map selector
-             column(3,
-                    radioButtons(inputId = "base_map",
-                                 label = h4("Select a Base Map"),
-                                 choices = c("Minimal" = "CartoDB.Positron",
-                                             "Detailed" = "OpenStreetMap.Mapnik"),
-                                 inline = TRUE)
-             ),
-
-             # locality selector
-             column(5,
-                    checkboxGroupInput(inputId = "locality",
-                                       label = h4("Select Localities"),
-                                       choices = c("Albemarle" = "003",
-                                                   "Charlottesvile" = "540",
-                                                   "Fluvanna" = "065",
-                                                   "Greene" = "079",
-                                                   "Louisa" = "109",
-                                                   "Nelson" = "125"),
-                                       selected = c("003", "540", "065",
-                                                    "079", "109", "125"),
-                                       inline = TRUE)
-             )
-
-           )
-
-           ),
-
-  ## information navbars ----
-  tabPanel("Documentation"),
-  tabPanel("About"),
-
-  singleton(tags$head(tags$script(src = "message-handler.js")))
+                 
+                 ## indicator selectors and plots ----
+                 tabPanel("Main",
+                          # App title ----
+                          titlePanel(div(
+                            windowTitle = "Cville Climate Equity Atlas",
+                            img(src = "ec_climate_logo.png", height='200', class = "bg"),
+                          )),
+                          
+                          tags$br(),
+                          
+                          fluidRow(
+                            
+                            # Sidebar for indicator 1
+                            column(2,
+                                   selectInput(inputId = "indicator1",
+                                               label = h4("Select Variable 1 (X)"),
+                                               choices = ind_demfirst_ct,
+                                               selected = ind_demfirst_ct$`Demographic & Social`["Estimated Population"]),
+                                   # variable definitions
+                                   textOutput("ind1_defn"),
+                                   textOutput("ind1_source")
+                                   
+                            ),
+                            
+                            # Place figures
+                            column(8,
+                                   tabsetPanel(type = "tabs",
+                                               tabPanel(title = 'Map', align = 'center',
+                                                        leafletOutput(outputId = 'leaf', width = '100%')
+                                               ),
+                                               tabPanel(title = "Correlation",
+                                                        plotlyOutput(outputId = "scatterplot")
+                                               ),
+                                               tabPanel(title = "Differences",
+                                                        plotlyOutput(outputId = 'tercile_plot')
+                                               ),
+                                               tabPanel(title = "Variable Details",
+                                                        strong(textOutput("var1_name")),
+                                                        textOutput("var1_abt"),
+                                                        textOutput("var1_source"),
+                                                        tags$br(),
+                                                        strong(textOutput("var2_name")),
+                                                        textOutput("var2_abt"),
+                                                        textOutput("var2_source"))
+                                   )
+                            ),
+                            
+                            # Sidebar for indicator 2
+                            column(2,
+                                   selectInput(inputId = "indicator2",
+                                               label = h4("Select Variable 2 (Y)"),
+                                               choices = ind_climfirst_ct,
+                                               selected = ind_climfirst_ct$`Climate Measures`["Average Land Surface Temperature"]),
+                                   # variable definitions
+                                   textOutput("ind2_defn"),
+                                   textOutput("ind2_source")
+                                   
+                            )
+                          ),
+                          
+                          tags$hr(),
+                          
+                          ## county/map/geography selector ----
+                          fluidRow(
+                            
+                            # base map selector
+                            column(3,
+                                   radioButtons(inputId = "base_map",
+                                                label = h4("Select a Base Map"),
+                                                choices = c("Minimal" = "CartoDB.Positron",
+                                                            "Detailed" = "OpenStreetMap.Mapnik"),
+                                                inline = TRUE)
+                            ),
+                            
+                            # locality selector
+                            column(5,
+                                   checkboxGroupInput(inputId = "locality",
+                                                      label = h4("Select Localities"),
+                                                      choices = c("Albemarle" = "003",
+                                                                  "Charlottesvile" = "540",
+                                                                  "Fluvanna" = "065",
+                                                                  "Greene" = "079",
+                                                                  "Louisa" = "109",
+                                                                  "Nelson" = "125"),
+                                                      selected = c("003", "540", "065",
+                                                                   "079", "109", "125"),
+                                                      inline = TRUE)
+                            )
+                            
+                          )
+                          
+                 ),
+                 
+                 ## information navbars ----
+                 tabPanel("Documentation"),
+                 tabPanel("About"),
+                 
+                 singleton(tags$head(tags$script(src = "message-handler.js")))
 )
 
 
@@ -171,25 +165,28 @@ ui <- navbarPage("Regional Climate Equity Atlas",
 # ....................................
 # Define Server Logic ----
 server <- function(input, output, session) {
-
+  
   geo_data <- reactive({
     if (input$indicator1 == input$indicator2) {
       session$sendCustomMessage(type = 'testmessage',
                                 message = paste0("Please make sure that you've selected two different variables."))
+    } else if (length(input$locality) == 0) {
+      session$sendCustomMessage(type = 'testmessage',
+                                message = paste0("At least one locality must be selected."))
     } else {
-    geo <- geo %>%
-      dplyr::select(x = !!sym(input$indicator1),
-                    y = !!sym(input$indicator2),
-                    locality, countyname, tract, geoid,
-                    pop = pop) %>%
-      dplyr::filter(locality %in% input$locality) %>% 
-      drop_na()
+      geo <- geo %>%
+        dplyr::select(x = !!sym(input$indicator1),
+                      y = !!sym(input$indicator2),
+                      locality, countyname, tract, geoid,
+                      pop = pop) %>%
+        dplyr::filter(locality %in% input$locality) %>%
+        drop_na()
     }
   })
-
+  
   ## output scatterplot ----
   output$scatterplot <- renderPlotly({
-    if (input$indicator1 == input$indicator2) {
+    if (input$indicator1 == input$indicator2 | length(input$locality) == 0) {
       plotly_empty()
     } else {
       d <- st_drop_geometry(geo_data())
@@ -199,14 +196,14 @@ server <- function(input, output, session) {
         layout(yaxis = list(showgrid = FALSE,
                             showticklabels = FALSE),
                xaxis = list(showticklabels = FALSE))
-
+      
       yhist <- plot_ly(data = d, y = ~y,
                        type = "histogram", nbinsx = 20,
                        alpha = .75, color = I("grey")) %>%
         layout(xaxis = list(showgrid = FALSE,
                             showticklabels = TRUE),
                yaxis = list(showticklabels = FALSE))
-
+      
       xyscatter <- plot_ly(data = d, x = ~x, y = ~y,
                            type = "scatter",
                            mode = "markers",
@@ -222,16 +219,19 @@ server <- function(input, output, session) {
         layout(xaxis = list(title = attr(d$x, "goodname"), showticklabels = TRUE),
                yaxis = list(title = attr(d$y, "goodname"), showticklabels = TRUE),
                legend = list(orientation = "h", x = 0, y = -0.2))
-
+      
+      # note: in the legend, we hide trace 1 (the xhist) and trace (3 + length(input$locality)), which is the yhist;
+      #       the yhist's trace # changes as a user selects different localities to map, but it can be dynamically
+      #       referenced as... yhist trace number = 1 (xhist) + 1 (plotly_empty) + n_localities + 1 (to reach the yhist)
       subplot(xhist, plotly_empty(), xyscatter, yhist,
               nrows = 2, heights = c(.2, .8), widths = c(.8,.2), margin = 0,
               shareX = TRUE, shareY = TRUE) %>%
-        style(showlegend = FALSE, traces = c(1,9)) %>%  # remove hist symbols from legend
+        style(showlegend = FALSE, traces = c(1, sum(3 + length(input$locality)))) %>%
         layout(xaxis = list(showgrid = TRUE),
                yaxis2 = list(showgrid = TRUE))
     }
   })
-
+  
   ## output map ----
   #build static parts of map, and display initial outline of region
   output$leaf <- renderLeaflet({
@@ -247,7 +247,7 @@ server <- function(input, output, session) {
   })
   # when a variable or locality selection is changed, render the appropriate bichoropleth without losing the legend
   observeEvent(listen_closely(), {
-    if (input$indicator1 == input$indicator2) {
+    if (input$indicator1 == input$indicator2 | length(input$locality) == 0) {
       leafletProxy('leaf') %>% clearShapes()
     } else if (input$indicator1 %in% cant_map | input$indicator2 %in% cant_map) {
       session$sendCustomMessage(type = 'testmessage', message = cant_map_message)
@@ -277,81 +277,82 @@ server <- function(input, output, session) {
                                    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Relative to other tracts: ", to_map$var2_tercile_cat))
     }
   })
-
+  
   ## output tercile plot ----
   output$tercile_plot <- renderPlotly({
-    if (input$indicator1 %in% cant_map | input$indicator2 %in% cant_map | input$indicator1 == input$indicator2) {
-      ""
+    if (input$indicator1 %in% cant_map | input$indicator2 %in% cant_map | input$indicator1 == input$indicator2 | length(input$locality) == 0) {
+      plotly_empty()
     } else {
       to_tercile <- bi_class(geo_data(), x = x, y = y, style = "quantile", dim = 3)
       to_tercile$var1_tercile <- stri_extract(to_tercile$bi_class, regex = '^\\d{1}(?=-\\d)')
-      to_tercile$`Var 1 Group` <- ifelse(to_tercile$var1_tercile == 1, 'Low', ifelse(to_tercile$var1_tercile == 2, 'Middle', ifelse(to_tercile$var1_tercile == 3, 'High', '')))
-      to_tercile <- to_tercile %>% group_by(var1_tercile) %>% 
-        mutate(`Var 2 Mean` = mean(y, na.rm = T)) %>% 
-        slice(1)
-      # to_tercile <- to_tercile[to_tercile$var1_tercile %in% 1:3, ]
       
+      to_tercile$`Var 1 Group` <- ifelse(to_tercile$var1_tercile == 1, 'Low', ifelse(to_tercile$var1_tercile == 2, 'Medium', ifelse(to_tercile$var1_tercile == 3, 'High', '')))
+      to_tercile <- to_tercile %>% group_by(var1_tercile) %>% mutate(`Var 2 Mean` = mean(y, na.rm = T)) %>% slice(1)
       t <- ggplot(to_tercile, aes(x = var1_tercile, y = `Var 2 Mean`,
                                   fill = var1_tercile, label = `Var 1 Group`,
                                   text = paste0('Mean of ', attr(to_tercile$y, "goodname"), ': ', round(`Var 2 Mean`, digits = 3)))) +
         geom_bar(stat = 'identity') +
         scale_fill_manual(values = c('#dfb0d6', '#a5add3', '#569ab9')) +
         scale_x_discrete(labels = paste0(c('Lowest ', 'Middle ', 'Highest '), 'third of tracts')) +
-        labs(x = attr(to_tercile$x, "goodname"), 
+        labs(x = attr(to_tercile$x, "goodname"),
              y = attr(to_tercile$y, "goodname")) +
-        #theme(legend.position = 'none') +
         theme_minimal()
       
       ggplotly(t, tooltip = c('text')) %>%
         layout(showlegend = FALSE, yaxis = list(side = "right"))
+      
     }
   })
-
-  # output indicator 1 description
-output$ind1_defn <- renderText({
-  attr(geo_data()$x, "description")
-})
-
-# output indicator 1 source
-output$ind1_source <- renderText({
-  paste("Source: ", attr(geo_data()$x, "source"))
-})
-
-# output indicator 2 description
-output$ind2_defn <- renderText({
-  attr(geo_data()$y, "description")
-})
-
-# output indicator 2 description
-output$ind2_source <- renderText({
-  paste("Source: ", attr(geo_data()$y, "source"))
-})
-
-# detailed var info
-output$var1_name <- renderText({
-  attr(geo_data()$x, "goodname")
-})
-
-output$var1_abt <- renderText({
-  attr(geo_data()$x, "about")
-})
-
-output$var1_source <- renderText({
-  paste("Source: ", attr(geo_data()$x, "source"))
-})
-
-output$var2_name <- renderText({
-  attr(geo_data()$y, "goodname")
-})
-
-output$var2_abt <- renderText({
-  attr(geo_data()$y, "about")
-})
-
-output$var2_source <- renderText({
-  paste("Source: ", attr(geo_data()$y, "source"))
-})
-
+  
+  ## output variable information ----
+  
+  # by selector
+  # indicator 1
+  output$ind1_defn <- renderText({
+    attr(geo_data()$x, "description")
+  })
+  
+  output$ind1_source <- renderText({
+    paste("Source: ", attr(geo_data()$x, "source"))
+  })
+  
+  # indicator 2
+  output$ind2_defn <- renderText({
+    attr(geo_data()$y, "description")
+  })
+  
+  # indicator 2 description by selector
+  output$ind2_source <- renderText({
+    paste("Source: ", attr(geo_data()$y, "source"))
+  })
+  
+  # detailed var info on var info tab
+  # indicator 1
+  output$var1_name <- renderText({
+    attr(geo_data()$x, "goodname")
+  })
+  
+  output$var1_abt <- renderText({
+    attr(geo_data()$x, "about")
+  })
+  
+  output$var1_source <- renderText({
+    paste("Source: ", attr(geo_data()$x, "source"))
+  })
+  
+  # indicator 2
+  output$var2_name <- renderText({
+    attr(geo_data()$y, "goodname")
+  })
+  
+  output$var2_abt <- renderText({
+    attr(geo_data()$y, "about")
+  })
+  
+  output$var2_source <- renderText({
+    paste("Source: ", attr(geo_data()$y, "source"))
+  })
+  
 }
 # Run the application ----
 shinyApp(ui = ui, server = server)
