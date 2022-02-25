@@ -5,7 +5,7 @@
 ## 
 ## Authors: Michele Claibourn
 ## Created: 2022-01-31
-## Updated: 2022-02-14
+## Updated: 2022-02-24
 ## ......................................
 
 # Setup ----
@@ -28,9 +28,13 @@ library(janitor)
 ## ......................................
 
 
-acs <- read_csv("data-csv/acs_cville_tract.csv") %>% 
+acs <- read_csv("data-csv/acs_tract_cville.csv") %>% # fix this name (cville_tract)
   mutate(geoid = as.character(GEOID)) %>% 
   select(geoid, locality, tract, ends_with("E"))
+
+life <- read_csv("data-csv/lifeexp_cville_tract.csv") %>% 
+  mutate(geoid = as.character(GEOID)) %>% 
+  select(geoid, life_expectancy)
 
 air <- read_csv("data-csv/airquality_cville_tract.csv") %>% 
   mutate(geoid = as.character(gid)) %>% 
@@ -100,6 +104,7 @@ nlcd <- read_csv("data-csv/nlcd_cville_tract.csv") %>%
 # Merge tract data ----
 df <- acs %>% 
   left_join(cdc) %>% 
+  left_join(life) %>% 
   left_join(air) %>% 
   left_join(lexp) %>% 
   left_join(daym) %>% 
@@ -125,6 +130,7 @@ googlesheets4::gs4_deauth()
 url_sheet <- "https://docs.google.com/spreadsheets/d/1nqm3DuVXD1ObbVe_deacvT7uSLdBXfQJo3mkbqDwrVo/edit?usp=sharing"
 
 pretty_acs <- googlesheets4::read_sheet(url_sheet, sheet = "acs")
+pretty_lif <- googlesheets4::read_sheet(url_sheet, sheet = "life")
 pretty_cdc <- googlesheets4::read_sheet(url_sheet, sheet = "cdc_places")
 pretty_air <- googlesheets4::read_sheet(url_sheet, sheet = "airquality")
 pretty_lex <- googlesheets4::read_sheet(url_sheet, sheet = "lead_exposure")
