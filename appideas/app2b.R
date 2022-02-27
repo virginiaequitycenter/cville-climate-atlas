@@ -39,6 +39,7 @@ library(biscale)
 library(sf)
 library(leafem)
 library(stringi)
+library(knitr)
 
 load("data/cvl_dat.RData")
 # data prepared in combine_data.R
