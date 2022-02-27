@@ -2,8 +2,39 @@ library(tidyverse)
 library(plotly)
 library(leaflet)
 
-df <- readRDS("data/cvl_data.RDS")
+library(scales)
+library(RColorBrewer)
+library(jcolors)
+library(ggthemes)
+library(ggsci)
+library(ghibli)
 
+df <- readRDS("appideas/data/cvl_data.RDS")
+
+# Try other colors
+# Rcolorbrewer::Set1; Dark2
+# jcolor::pal5; rainbow
+# ggthemes::few_medium; calc
+# ggsci::uniform_startrek
+# ghibli::MononokeMedium; KikiMedium; SpiritedMedium; PonyoMedium
+
+
+pal <- RColorBrewer::brewer.pal(6, "Set1")
+pal <- unname(jcolors("pal5")[1:6])
+pal <- unname(jcolors("rainbow")[c(8,2,6,4,1,3)])
+# show_col(few_pal("Dark")(8))
+pal <- c("#265dab", "#df5c24", "#c7b42e", "#059748",
+         "#cb2027", "#9d722a")
+# show_col(solarized_pal()(8))
+pal <- c("#268bd2", "#cb4b16", "#b58900", "#859900",
+         "#d33682", "#6c71c4")
+# show_col(calc_pal()(9))
+pal <- c("#004586", "#ff420e", "#ffd320", "#579d1c",
+         "#7e0021", "#83caff")
+# show_col(pal_startrek()(7))
+pal <- c("#7c878eff", "#ffcd00ff", "#00b5e2ff", "#00af66ff",
+         "#5c88daff", "#84bd00ff")
+pal <- ghibli_palette("MarnieMedium2")[2:7]
 
 # In parts
 xhist <- plot_ly(data = df, x = ~tree_can, type = 'histogram', 
@@ -24,10 +55,12 @@ xyscatter <- plot_ly(data = df,
                      x = ~tree_can, 
                      y = ~whiteE, 
                      type = 'scatter',
+                     mode = 'markers', # to remove mode warning
+                     fill = ~'', # to remove line.width error
                      size = ~totalpopE, 
                      sizes = c(1, 500),
                      color = ~countyname, 
-                     colors = "Dark2", 
+                     colors = pal, 
                      alpha = .75,
                      text = paste0("County: ", df$countyname, "<br>",
                                    "Population: ", df$totalpopE, "<br>",

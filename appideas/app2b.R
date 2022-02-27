@@ -1,8 +1,8 @@
 # ....................................
 # Begin Climate Equity Atlas Development
 # Authors: Michele Claibourn, others
-# Updated: February 5, 2022
-#          2022-02-25 mpc, jacob-gg
+# Updated: February 27, 2022
+#          2022-02-27 mpc, jacob-gg
 # ....................................
 
 # Phase 1a: added select indicators, output plotly scatterplot, add sample header
@@ -154,7 +154,8 @@ ui <- navbarPage("Regional Climate Equity Atlas",
            ),
 
   ## information navbars ----
-  tabPanel("Documentation"),
+  tabPanel("Data Documentation",
+           uiOutput("documentation")),
   tabPanel("About"),
 
   singleton(tags$head(tags$script(src = "message-handler.js")))
@@ -352,6 +353,9 @@ output$var2_abt <- renderText({
 output$var2_source <- renderText({
   paste("Source: ", attr(geo_data()$y, "source"))
 })
+
+## output data documentation ----
+output$documentation <- renderUI(includeHTML("cville_climate_update.html"))
 
 }
 # Run the application ----

@@ -1,0 +1,359 @@
+---
+title: Scatterplot Colors
+output: 
+  html_document:
+    css: style.css
+    toc: true
+    toc_float: true
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+library(knitr)
+library(tidyverse)
+library(plotly)
+
+df <- readRDS("data/cvl_data.RDS")
+```
+
+Michael pointed out that the scatterplot colors had some overlap with the bivariate color palette that could be confusing -- folks might make unintended connections between the two palettes. I spent some time looking through some other qualitative palette options (using [Emil Hvitfeldt's fantabulous curated list](https://github.com/EmilHvitfeldt/r-color-palettes) of R color palettes as a guide), but I need other eyes on the possibilities. I've added the bivariate legend on the sidebar so you can see the scatterplot palette in relation to all of the options.
+
+## RColorBrewer::Dark2
+This is the current palette; note how the off-diagonal colors on the bivarate color matrix have close analogues in this Greene, Fluvanna, and Albemarle colors.
+
+```{r dark2}
+library(RColorBrewer)
+pal <- brewer.pal(6, "Dark2")
+
+plot_ly(data = df, 
+                     x = ~tree_can, 
+                     y = ~whiteE, 
+                     type = 'scatter',
+                     mode = 'markers', # to remove mode warning
+                     fill = ~'', # to remove line.width error
+                     size = ~totalpopE, 
+                     sizes = c(1, 500),
+                     color = ~countyname, 
+                     colors = pal, 
+                     alpha = .75,
+                     text = paste0("County: ", df$countyname, "<br>",
+                                   "Population: ", df$totalpopE, "<br>",
+                                   "Census tract: ", df$tract, "<br>",
+                                   "X: ", df$tree_can, "<br>",
+                                   "Y: ", df$whiteE, "<br>"),
+                     hoverinfo = "text") %>% 
+  layout(xaxis = list(title = "Tree Canopy", showticklabels = TRUE),
+         yaxis = list(title = "Percent White", showtickLabels = TRUE),
+         legend = list(orientation = "h", x = 0, y = -0.2))
+
+```
+
+## RColorBrewer::Set1
+An alternative color palette: I like this one and think it overlaps less, but it feels a tad too cheery to me.
+```{r set1}
+pal <- brewer.pal(6, "Set1")
+
+plot_ly(data = df, 
+                     x = ~tree_can, 
+                     y = ~whiteE, 
+                     type = 'scatter',
+                     mode = 'markers', # to remove mode warning
+                     fill = ~'', # to remove line.width error
+                     size = ~totalpopE, 
+                     sizes = c(1, 500),
+                     color = ~countyname, 
+                     colors = pal, 
+                     alpha = .75,
+                     text = paste0("County: ", df$countyname, "<br>",
+                                   "Population: ", df$totalpopE, "<br>",
+                                   "Census tract: ", df$tract, "<br>",
+                                   "X: ", df$tree_can, "<br>",
+                                   "Y: ", df$whiteE, "<br>"),
+                     hoverinfo = "text") %>% 
+  layout(xaxis = list(title = "Tree Canopy", showticklabels = TRUE),
+         yaxis = list(title = "Percent White", showtickLabels = TRUE),
+         legend = list(orientation = "h", x = 0, y = -0.2))
+
+```
+
+## jcolors::pal5
+The color assigned to Charlottesville in this one may be a bit light.
+```{r pal5}
+library(jcolors)
+pal <- unname(jcolors("pal5")[1:6])
+
+plot_ly(data = df, 
+                     x = ~tree_can, 
+                     y = ~whiteE, 
+                     type = 'scatter',
+                     mode = 'markers', # to remove mode warning
+                     fill = ~'', # to remove line.width error
+                     size = ~totalpopE, 
+                     sizes = c(1, 500),
+                     color = ~countyname, 
+                     colors = pal, 
+                     alpha = .75,
+                     text = paste0("County: ", df$countyname, "<br>",
+                                   "Population: ", df$totalpopE, "<br>",
+                                   "Census tract: ", df$tract, "<br>",
+                                   "X: ", df$tree_can, "<br>",
+                                   "Y: ", df$whiteE, "<br>"),
+                     hoverinfo = "text") %>% 
+  layout(xaxis = list(title = "Tree Canopy", showticklabels = TRUE),
+         yaxis = list(title = "Percent White", showtickLabels = TRUE),
+         legend = list(orientation = "h", x = 0, y = -0.2))
+```
+
+## jcolors::rainbow
+I selected 6 of the 9 colors from this palette that seemed less overlappy with the bivariate legend, and assigned them out of order (so Greene would be green).
+```{r rainbow}
+pal <- unname(jcolors("rainbow")[c(8,2,6,4,1,3)])
+
+plot_ly(data = df, 
+                     x = ~tree_can, 
+                     y = ~whiteE, 
+                     type = 'scatter',
+                     mode = 'markers', # to remove mode warning
+                     fill = ~'', # to remove line.width error
+                     size = ~totalpopE, 
+                     sizes = c(1, 500),
+                     color = ~countyname, 
+                     colors = pal, 
+                     alpha = .75,
+                     text = paste0("County: ", df$countyname, "<br>",
+                                   "Population: ", df$totalpopE, "<br>",
+                                   "Census tract: ", df$tract, "<br>",
+                                   "X: ", df$tree_can, "<br>",
+                                   "Y: ", df$whiteE, "<br>"),
+                     hoverinfo = "text") %>% 
+  layout(xaxis = list(title = "Tree Canopy", showticklabels = TRUE),
+         yaxis = list(title = "Percent White", showtickLabels = TRUE),
+         legend = list(orientation = "h", x = 0, y = -0.2))
+```
+
+## ggthemes::few
+Chose six of eight colors from this palette (excluding pink and purple).
+```{r few}
+library(ggthemes)
+pal <- c("#265dab", "#df5c24", "#c7b42e", "#059748",
+         "#cb2027", "#9d722a")
+
+plot_ly(data = df, 
+                     x = ~tree_can, 
+                     y = ~whiteE, 
+                     type = 'scatter',
+                     mode = 'markers', # to remove mode warning
+                     fill = ~'', # to remove line.width error
+                     size = ~totalpopE, 
+                     sizes = c(1, 500),
+                     color = ~countyname, 
+                     colors = pal, 
+                     alpha = .75,
+                     text = paste0("County: ", df$countyname, "<br>",
+                                   "Population: ", df$totalpopE, "<br>",
+                                   "Census tract: ", df$tract, "<br>",
+                                   "X: ", df$tree_can, "<br>",
+                                   "Y: ", df$whiteE, "<br>"),
+                     hoverinfo = "text") %>% 
+  layout(xaxis = list(title = "Tree Canopy", showticklabels = TRUE),
+         yaxis = list(title = "Percent White", showtickLabels = TRUE),
+         legend = list(orientation = "h", x = 0, y = -0.2))
+```
+
+
+## ggthemes::calc
+```{r calc}
+pal <- c("#004586", "#ff420e", "#ffd320", "#579d1c",
+         "#7e0021", "#83caff")
+
+plot_ly(data = df, 
+                     x = ~tree_can, 
+                     y = ~whiteE, 
+                     type = 'scatter',
+                     mode = 'markers', # to remove mode warning
+                     fill = ~'', # to remove line.width error
+                     size = ~totalpopE, 
+                     sizes = c(1, 500),
+                     color = ~countyname, 
+                     colors = pal, 
+                     alpha = .75,
+                     text = paste0("County: ", df$countyname, "<br>",
+                                   "Population: ", df$totalpopE, "<br>",
+                                   "Census tract: ", df$tract, "<br>",
+                                   "X: ", df$tree_can, "<br>",
+                                   "Y: ", df$whiteE, "<br>"),
+                     hoverinfo = "text") %>% 
+  layout(xaxis = list(title = "Tree Canopy", showticklabels = TRUE),
+         yaxis = list(title = "Percent White", showtickLabels = TRUE),
+         legend = list(orientation = "h", x = 0, y = -0.2))
+```
+
+## ggsci::startrek
+I quite like this one, and not just because I'm very excited about Star Trek.
+```{r startrek}
+library(ggsci)
+pal <- c("#7c878eff", "#ffcd00ff", "#00b5e2ff", "#00af66ff",
+         "#5c88daff", "#84bd00ff")
+
+plot_ly(data = df, 
+                     x = ~tree_can, 
+                     y = ~whiteE, 
+                     type = 'scatter',
+                     mode = 'markers', # to remove mode warning
+                     fill = ~'', # to remove line.width error
+                     size = ~totalpopE, 
+                     sizes = c(1, 500),
+                     color = ~countyname, 
+                     colors = pal, 
+                     alpha = .75,
+                     text = paste0("County: ", df$countyname, "<br>",
+                                   "Population: ", df$totalpopE, "<br>",
+                                   "Census tract: ", df$tract, "<br>",
+                                   "X: ", df$tree_can, "<br>",
+                                   "Y: ", df$whiteE, "<br>"),
+                     hoverinfo = "text") %>% 
+  layout(xaxis = list(title = "Tree Canopy", showticklabels = TRUE),
+         yaxis = list(title = "Percent White", showtickLabels = TRUE),
+         legend = list(orientation = "h", x = 0, y = -0.2))
+```
+
+
+## ghibli::Mononoke
+Now for a series from the ghibli package, with palettes I've long wanted to use, but have yet to find the right project for... could this be the one?
+
+The Ghibil Fandom wiki describes Princess Mononoke as a story about "the struggle between the supernatural guardians of a forest and the humans who consume its resources."
+```{r mononoke}
+library(ghibli)
+pal <- ghibli_palette("MononokeMedium")[2:7]
+
+plot_ly(data = df, 
+                     x = ~tree_can, 
+                     y = ~whiteE, 
+                     type = 'scatter',
+                     mode = 'markers', # to remove mode warning
+                     fill = ~'', # to remove line.width error
+                     size = ~totalpopE, 
+                     sizes = c(1, 500),
+                     color = ~countyname, 
+                     colors = pal, 
+                     alpha = .75,
+                     text = paste0("County: ", df$countyname, "<br>",
+                                   "Population: ", df$totalpopE, "<br>",
+                                   "Census tract: ", df$tract, "<br>",
+                                   "X: ", df$tree_can, "<br>",
+                                   "Y: ", df$whiteE, "<br>"),
+                     hoverinfo = "text") %>% 
+  layout(xaxis = list(title = "Tree Canopy", showticklabels = TRUE),
+         yaxis = list(title = "Percent White", showtickLabels = TRUE),
+         legend = list(orientation = "h", x = 0, y = -0.2))
+```
+
+## ghibli::Kiki
+Kiki's Delivery Service is not as thematically aligned, but pretty.
+```{r kiki}
+pal <- ghibli_palette("KikiMedium")[2:7]
+
+plot_ly(data = df, 
+                     x = ~tree_can, 
+                     y = ~whiteE, 
+                     type = 'scatter',
+                     mode = 'markers', # to remove mode warning
+                     fill = ~'', # to remove line.width error
+                     size = ~totalpopE, 
+                     sizes = c(1, 500),
+                     color = ~countyname, 
+                     colors = pal, 
+                     alpha = .75,
+                     text = paste0("County: ", df$countyname, "<br>",
+                                   "Population: ", df$totalpopE, "<br>",
+                                   "Census tract: ", df$tract, "<br>",
+                                   "X: ", df$tree_can, "<br>",
+                                   "Y: ", df$whiteE, "<br>"),
+                     hoverinfo = "text") %>% 
+  layout(xaxis = list(title = "Tree Canopy", showticklabels = TRUE),
+         yaxis = list(title = "Percent White", showtickLabels = TRUE),
+         legend = list(orientation = "h", x = 0, y = -0.2))
+```
+
+## ghibli::Spirited
+Spirited Away, a young girl navigates the spirit world and saves her parents; I'm actually like these muted palettes, but wondering if they are visually distinct enough (though perhaps strong visual distinctions between the localities isn't necessary).
+```{r spirited}
+pal <- ghibli_palette("SpiritedMedium")[2:7]
+
+plot_ly(data = df, 
+                     x = ~tree_can, 
+                     y = ~whiteE, 
+                     type = 'scatter',
+                     mode = 'markers', # to remove mode warning
+                     fill = ~'', # to remove line.width error
+                     size = ~totalpopE, 
+                     sizes = c(1, 500),
+                     color = ~countyname, 
+                     colors = pal, 
+                     alpha = .75,
+                     text = paste0("County: ", df$countyname, "<br>",
+                                   "Population: ", df$totalpopE, "<br>",
+                                   "Census tract: ", df$tract, "<br>",
+                                   "X: ", df$tree_can, "<br>",
+                                   "Y: ", df$whiteE, "<br>"),
+                     hoverinfo = "text") %>% 
+  layout(xaxis = list(title = "Tree Canopy", showticklabels = TRUE),
+         yaxis = list(title = "Percent White", showtickLabels = TRUE),
+         legend = list(orientation = "h", x = 0, y = -0.2))
+```
+
+## ghibli::Ponyo
+A fish becomes human and the balance of nature is temporarily disrupted
+```{r ponyo}
+pal <- ghibli_palette("PonyoMedium")[2:7]
+
+plot_ly(data = df, 
+                     x = ~tree_can, 
+                     y = ~whiteE, 
+                     type = 'scatter',
+                     mode = 'markers', # to remove mode warning
+                     fill = ~'', # to remove line.width error
+                     size = ~totalpopE, 
+                     sizes = c(1, 500),
+                     color = ~countyname, 
+                     colors = pal, 
+                     alpha = .75,
+                     text = paste0("County: ", df$countyname, "<br>",
+                                   "Population: ", df$totalpopE, "<br>",
+                                   "Census tract: ", df$tract, "<br>",
+                                   "X: ", df$tree_can, "<br>",
+                                   "Y: ", df$whiteE, "<br>"),
+                     hoverinfo = "text") %>% 
+  layout(xaxis = list(title = "Tree Canopy", showticklabels = TRUE),
+         yaxis = list(title = "Percent White", showtickLabels = TRUE),
+         legend = list(orientation = "h", x = 0, y = -0.2))
+```
+
+## ghibli::Totoro
+My Neighbor Totoro, wood spirits and environmentalism - I love this movie so much.
+```{r totoro}
+pal <- ghibli_palette("TotoroMedium")[2:7]
+
+plot_ly(data = df, 
+                     x = ~tree_can, 
+                     y = ~whiteE, 
+                     type = 'scatter',
+                     mode = 'markers', # to remove mode warning
+                     fill = ~'', # to remove line.width error
+                     size = ~totalpopE, 
+                     sizes = c(1, 500),
+                     color = ~countyname, 
+                     colors = pal, 
+                     alpha = .75,
+                     text = paste0("County: ", df$countyname, "<br>",
+                                   "Population: ", df$totalpopE, "<br>",
+                                   "Census tract: ", df$tract, "<br>",
+                                   "X: ", df$tree_can, "<br>",
+                                   "Y: ", df$whiteE, "<br>"),
+                     hoverinfo = "text") %>% 
+  layout(xaxis = list(title = "Tree Canopy", showticklabels = TRUE),
+         yaxis = list(title = "Percent White", showtickLabels = TRUE),
+         legend = list(orientation = "h", x = 0, y = -0.2))
+```
