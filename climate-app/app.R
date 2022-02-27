@@ -154,7 +154,8 @@ ui <- navbarPage("Regional Climate Equity Atlas",
                  ),
                  
                  ## information navbars ----
-                 tabPanel("Documentation"),
+                 tabPanel("Data Documentation",
+                          uiOutput("documentation")),
                  tabPanel("About"),
                  
                  singleton(tags$head(tags$script(src = "message-handler.js")))
@@ -352,6 +353,9 @@ server <- function(input, output, session) {
   output$var2_source <- renderText({
     paste("Source: ", attr(geo_data()$y, "source"))
   })
+  
+  ## output data documentation ----
+  output$documentation <- renderUI(includeHTML("cville_climate_update.html"))
   
 }
 # Run the application ----

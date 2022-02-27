@@ -358,5 +358,6 @@ output$var2_source <- renderText({
 output$documentation <- renderUI(includeHTML("cville_climate_update.html"))
 
 }
+
 # Run the application ----
 shinyApp(ui = ui, server = server)

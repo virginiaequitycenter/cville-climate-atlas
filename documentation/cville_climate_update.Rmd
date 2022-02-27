@@ -54,7 +54,9 @@ table <- table %>%
 ## <a id="process"></a>Data Collection Process
 In the summer of 2021, we began creating and refining a replicable data collection process to build a collection of data resources for use in our collective work and by anyone in the community. The process is intended to make this work transparent, to provide resources for other to use, and to be highly automated for easier updates.
 
-<img src="../images/Data Process.png" width="500" align="center">
+<div style="text-align: center;">
+<img src="../images/Data Process.png" width="500">
+</div>
 
 Based on the needs and requests for additional information and data from within our coalition, and those articulated by additional community partners, we 
 
