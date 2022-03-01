@@ -40,6 +40,7 @@ library(sf)
 library(leafem)
 library(stringi)
 library(knitr)
+library(DT)
 
 load("data/cvl_dat.RData")
 # data prepared in combine_data.R
