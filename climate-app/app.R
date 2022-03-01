@@ -1,8 +1,7 @@
 # ....................................
 # Begin Climate Equity Atlas Development
 # Authors: Michele Claibourn, others
-# Updated: February 5, 2022
-#          2022-02-25 mpc, jacob-gg
+# Last updated: 2022-03-01 jacob-gg
 # ....................................
 
 # Phase 1a: added select indicators, output plotly scatterplot, add sample header
@@ -40,6 +39,7 @@ library(sf)
 library(leafem)
 library(stringi)
 library(knitr)
+library(htmltools)
 
 load("data/cvl_dat.RData")
 # data prepared in combine_data.R
@@ -60,7 +60,7 @@ cant_map_message <- c("One of your selected variables cannot be rendered in the 
 # ....................................
 # Define User Interface ----
 ui <- navbarPage("Regional Climate Equity Atlas",
-                 
+
                  ## indicator selectors and plots ----
                  tabPanel("Main",
                           # App title ----
@@ -68,11 +68,11 @@ ui <- navbarPage("Regional Climate Equity Atlas",
                             windowTitle = "Cville Climate Equity Atlas",
                             img(src = "ec_climate_logo.png", height='200', class = "bg"),
                           )),
-                          
+
                           tags$br(),
-                          
+
                           fluidRow(
-                            
+
                             # Sidebar for indicator 1
                             column(2,
                                    selectInput(inputId = "indicator1",
@@ -82,9 +82,9 @@ ui <- navbarPage("Regional Climate Equity Atlas",
                                    # variable definitions
                                    textOutput("ind1_defn"),
                                    textOutput("ind1_source")
-                                   
+
                             ),
-                            
+
                             # Place figures
                             column(8,
                                    tabsetPanel(type = "tabs",
@@ -107,7 +107,7 @@ ui <- navbarPage("Regional Climate Equity Atlas",
                                                         textOutput("var2_source"))
                                    )
                             ),
-                            
+
                             # Sidebar for indicator 2
                             column(2,
                                    selectInput(inputId = "indicator2",
@@ -117,15 +117,15 @@ ui <- navbarPage("Regional Climate Equity Atlas",
                                    # variable definitions
                                    textOutput("ind2_defn"),
                                    textOutput("ind2_source")
-                                   
+
                             )
                           ),
-                          
+
                           tags$hr(),
-                          
+
                           ## county/map/geography selector ----
                           fluidRow(
-                            
+
                             # base map selector
                             column(3,
                                    radioButtons(inputId = "base_map",
@@ -134,7 +134,7 @@ ui <- navbarPage("Regional Climate Equity Atlas",
                                                             "Detailed" = "OpenStreetMap.Mapnik"),
                                                 inline = TRUE)
                             ),
-                            
+
                             # locality selector
                             column(5,
                                    checkboxGroupInput(inputId = "locality",
@@ -149,18 +149,21 @@ ui <- navbarPage("Regional Climate Equity Atlas",
                                                                    "079", "109", "125"),
                                                       inline = TRUE)
                             )
-                            
+
                           )
-                          
+
                  ),
-                 
+
                  ## information navbars ----
                  tabPanel("Data Documentation",
                           #           includeHTML("cville_climate_update.html")
-                          uiOutput("documentation")
+                          # uiOutput("documentation"),
+                          htmltools::tags$iframe(src = 'cville_climate_update.html',
+                                                 style='width:100vw;height:100vh;',
+                                                 frameBorder = "0")
                  ),
                  tabPanel("About"),
-                 
+
                  singleton(tags$head(tags$script(src = "message-handler.js")))
 )
 
@@ -169,7 +172,7 @@ ui <- navbarPage("Regional Climate Equity Atlas",
 # ....................................
 # Define Server Logic ----
 server <- function(input, output, session) {
-  
+
   geo_data <- reactive({
     if (input$indicator1 == input$indicator2) {
       session$sendCustomMessage(type = 'testmessage',
@@ -187,7 +190,7 @@ server <- function(input, output, session) {
         drop_na()
     }
   })
-  
+
   ## output scatterplot ----
   output$scatterplot <- renderPlotly({
     if (input$indicator1 == input$indicator2 | length(input$locality) == 0) {
@@ -200,14 +203,14 @@ server <- function(input, output, session) {
         layout(yaxis = list(showgrid = FALSE,
                             showticklabels = FALSE),
                xaxis = list(showticklabels = FALSE))
-      
+
       yhist <- plot_ly(data = d, y = ~y,
                        type = "histogram", nbinsx = 20,
                        alpha = .75, color = I("grey")) %>%
         layout(xaxis = list(showgrid = FALSE,
                             showticklabels = TRUE),
                yaxis = list(showticklabels = FALSE))
-      
+
       xyscatter <- plot_ly(data = d, x = ~x, y = ~y,
                            type = "scatter",
                            mode = "markers",
@@ -223,7 +226,7 @@ server <- function(input, output, session) {
         layout(xaxis = list(title = attr(d$x, "goodname"), showticklabels = TRUE),
                yaxis = list(title = attr(d$y, "goodname"), showticklabels = TRUE),
                legend = list(orientation = "h", x = 0, y = -0.2))
-      
+
       # note: in the legend, we hide trace 1 (the xhist) and trace (3 + length(input$locality)), which is the yhist;
       #       the yhist's trace # changes as a user selects different localities to map, but it can be dynamically
       #       referenced as... yhist trace number = 1 (xhist) + 1 (plotly_empty) + n_localities + 1 (to reach the yhist)
@@ -235,7 +238,7 @@ server <- function(input, output, session) {
                yaxis2 = list(showgrid = TRUE))
     }
   })
-  
+
   ## output map ----
   #build static parts of map, and display initial outline of region
   output$leaf <- renderLeaflet({
@@ -281,7 +284,7 @@ server <- function(input, output, session) {
                                    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Relative to other tracts: ", to_map$var2_tercile_cat))
     }
   })
-  
+
   ## output tercile plot ----
   output$tercile_plot <- renderPlotly({
     if (input$indicator1 %in% cant_map | input$indicator2 %in% cant_map | input$indicator1 == input$indicator2 | length(input$locality) == 0) {
@@ -289,7 +292,7 @@ server <- function(input, output, session) {
     } else {
       to_tercile <- bi_class(geo_data(), x = x, y = y, style = "quantile", dim = 3)
       to_tercile$var1_tercile <- stri_extract(to_tercile$bi_class, regex = '^\\d{1}(?=-\\d)')
-      
+
       to_tercile$`Var 1 Group` <- ifelse(to_tercile$var1_tercile == 1, 'Low', ifelse(to_tercile$var1_tercile == 2, 'Medium', ifelse(to_tercile$var1_tercile == 3, 'High', '')))
       to_tercile <- to_tercile %>% group_by(var1_tercile) %>% mutate(`Var 2 Mean` = mean(y, na.rm = T)) %>% slice(1)
       t <- ggplot(to_tercile, aes(x = var1_tercile, y = `Var 2 Mean`,
@@ -301,65 +304,65 @@ server <- function(input, output, session) {
         labs(x = attr(to_tercile$x, "goodname"),
              y = attr(to_tercile$y, "goodname")) +
         theme_minimal()
-      
+
       ggplotly(t, tooltip = c('text')) %>%
         layout(showlegend = FALSE, yaxis = list(side = "right"))
-      
+
     }
   })
-  
+
   ## output variable information ----
-  
+
   # by selector
   # indicator 1
   output$ind1_defn <- renderText({
     attr(geo_data()$x, "description")
   })
-  
+
   output$ind1_source <- renderText({
     paste("Source: ", attr(geo_data()$x, "source"))
   })
-  
+
   # indicator 2
   output$ind2_defn <- renderText({
     attr(geo_data()$y, "description")
   })
-  
+
   # indicator 2 description by selector
   output$ind2_source <- renderText({
     paste("Source: ", attr(geo_data()$y, "source"))
   })
-  
+
   # detailed var info on var info tab
   # indicator 1
   output$var1_name <- renderText({
     attr(geo_data()$x, "goodname")
   })
-  
+
   output$var1_abt <- renderText({
     attr(geo_data()$x, "about")
   })
-  
+
   output$var1_source <- renderText({
     paste("Source: ", attr(geo_data()$x, "source"))
   })
-  
+
   # indicator 2
   output$var2_name <- renderText({
     attr(geo_data()$y, "goodname")
   })
-  
+
   output$var2_abt <- renderText({
     attr(geo_data()$y, "about")
   })
-  
+
   output$var2_source <- renderText({
     paste("Source: ", attr(geo_data()$y, "source"))
   })
-  
+
   ## about page ----
-  output$documentation <- renderUI(includeHTML("cville_climate_update.html"))
-  
+  # output$documentation <- renderUI(htmltools::includeHTML("cville_climate_update.html"))
+
 }
 # Run the application ----
 shinyApp(ui = ui, server = server)
