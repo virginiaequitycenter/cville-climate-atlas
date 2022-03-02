@@ -1,7 +1,7 @@
 # ....................................
 # Begin Climate Equity Atlas Development
 # Authors: Michele Claibourn, others
-# Last updated: 2022-03-01 jacob-gg
+# Last updated: 2022-03-02 jacob-gg
 # ....................................
 
 # Phase 1a: added select indicators, output plotly scatterplot, add sample header
@@ -55,7 +55,7 @@ bipal <- c("#e8e8e8", "#dfd0d6", "#be64ac", # A-1, A-2, A-3,
 
 # no-go variables for mapping
 cant_map <- c('indigE', 'othraceE', 'bbmax_up', 'HWAV_AFREQ', 'RFLD_AFREQ')
-cant_map_message <- c("One of your selected variables cannot be rendered in the map or in the tercile plot. This is usually because there isn't enough variation in the variable to break its values up into meaningful categories")
+cant_map_message <- c("One of your selected variables cannot be rendered in the map or in the tercile plot. This is usually because there isn't enough variation in the variable to break its values up into meaningful categories.")
 
 # ....................................
 # Define User Interface ----
