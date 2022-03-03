@@ -30,7 +30,7 @@ library(viridis)
 table <- read_sheet("https://docs.google.com/spreadsheets/d/1vfuiVf_aQikUNd7OW7TdUOHttp4ziSWnOO108CbXn0I/edit?usp=sharing", gs4_deauth())
 
 table <- table %>% 
-  select(Topics, `Data Source`, `Key metrics`, `Example Questions`, `Spatial unit`, Year, Documentation)
+  select(Topics, `Data Source`, `Key Metrics`, `Example Questions`, `Spatial Unit`, Year, Documentation)
 ```
 
 <br>
