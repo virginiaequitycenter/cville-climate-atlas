@@ -22,6 +22,8 @@
 #    updated plotly and leaflet hover info to round indicator values
 #    update data documentation (reduced)
 #    moved logo into navbar
+#    reduced tercile bar width
+#    made leaflet and plotly output plots taller (height = '500')
 
 # To do
 #    add about info, front page narrative for interpretation?;
@@ -104,10 +106,10 @@ ui <- fluidPage(
                             column(8,
                                    tabsetPanel(type = "tabs",
                                                tabPanel(title = 'Map', align = 'center',
-                                                        leafletOutput(outputId = 'leaf', width = '100%')
+                                                        leafletOutput(outputId = 'leaf', width = '100%', height = '500')
                                                ),
                                                tabPanel(title = "Correlation",
-                                                        plotlyOutput(outputId = "scatterplot")
+                                                        plotlyOutput(outputId = "scatterplot", width = '100%', height = '500')
                                                ),
                                                tabPanel(title = "Differences",
                                                         plotlyOutput(outputId = 'tercile_plot')
@@ -315,8 +317,8 @@ server <- function(input, output, session) {
       to_tercile <- to_tercile %>% group_by(var1_tercile) %>% mutate(`Var 2 Mean` = mean(y, na.rm = T)) %>% slice(1)
       t <- ggplot(to_tercile, aes(x = var1_tercile, y = `Var 2 Mean`,
                                   fill = var1_tercile, label = `Var 1 Group`,
-                                  text = paste0('Mean of ', attr(to_tercile$y, "goodname"), ': ', round(`Var 2 Mean`, digits = 3)))) +
-        geom_bar(stat = 'identity') +
+                                  text = paste0('Mean of ', attr(to_tercile$y, "goodname"), ': ', round(`Var 2 Mean`, digits = 2)))) +
+        geom_bar(stat = 'identity', width = 0.66) +
         scale_fill_manual(values = c('#dfb0d6', '#a5add3', '#569ab9')) +
         scale_x_discrete(labels = paste0(c('Lowest ', 'Middle ', 'Highest '), 'third of tracts')) +
         labs(x = attr(to_tercile$x, "goodname"),
