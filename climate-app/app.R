@@ -15,9 +15,13 @@
 #    updated meta (short description on front, notes on new tab)
 # initial output for tercile graph!
 
+# Phase 3:
+#    updated scatterplot colors with ggthemes::few palette
+#    updated plotly to get rid of warnings (line.widths, etc.)
+#    updated plotly and leaflet hover info to round indicator values
+
 # To do
 #    add documentation info, about info, front page narrative for interpretation?;
-#    check/add additional variables
 #    add short instructional bits for each element?
 #    get better header logo/image; customize theming/color/aesthetic elements
 #    ?add layering points (parks, schools, food retailers)
@@ -33,6 +37,7 @@
 library(shiny)
 library(tidyverse)
 library(plotly)
+library(ggthemes)
 library(leaflet)
 library(biscale)
 library(sf)
@@ -52,6 +57,9 @@ load("data/cvl_dat.RData")
 bipal <- c("#e8e8e8", "#dfd0d6", "#be64ac", # A-1, A-2, A-3,
            "#ace4e4", "#a5add3", "#8c62aa", # B-1, B-2, B-3
            "#5ac8c8", "#5698b9", "#3b4994") # C-1, C-2, C-3
+
+fewpal <- c("#265dab", "#df5c24", "#c7b42e", "#059748",
+         "#cb2027", "#9d722a")
 
 # no-go variables for mapping
 cant_map <- c('indigE', 'othraceE', 'bbmax_up', 'HWAV_AFREQ', 'RFLD_AFREQ')
@@ -213,15 +221,18 @@ server <- function(input, output, session) {
 
       xyscatter <- plot_ly(data = d, x = ~x, y = ~y,
                            type = "scatter",
-                           mode = "markers",
-                           size = ~pop, sizes = c(1, 500),
-                           color = ~countyname, colors = "Dark2",
+                           mode = 'markers', # to remove mode warning
+                           fill = ~'', # to remove line.width error
+                           size = ~pop, 
+                           sizes = c(1, 500),
+                           color = ~countyname, 
+                           colors = fewpal,
                            alpha = .75,
                            text = paste0("Locality: ", d$countyname, "<br>",
                                          "Census tract: ", d$tract, "<br>",
                                          "Population: ", d$pop, "<br>",
-                                         attr(d$x, "goodname"), ": ", d$x, "<br>",
-                                         attr(d$y, "goodname"), ": ", d$y, "<br>"),
+                                         attr(d$x, "goodname"), ": ", round(d$x, 2), "<br>",
+                                         attr(d$y, "goodname"), ": ", round(d$y, 2), "<br>"),
                            hoverinfo = "text") %>%
         layout(xaxis = list(title = attr(d$x, "goodname"), showticklabels = TRUE),
                yaxis = list(title = attr(d$y, "goodname"), showticklabels = TRUE),
@@ -278,9 +289,9 @@ server <- function(input, output, session) {
                       fillOpacity = 0.8,
                       bringToFront = T),
                     popup = paste0("Locality: ", to_map$countyname, ", ", to_map$tract, "<br>",
-                                   attr(to_map$x, "goodname"), ": ", to_map$x,  "<br>",
+                                   attr(to_map$x, "goodname"), ": ", round(to_map$x, 2),  "<br>",
                                    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Relative to other tracts: ", to_map$var1_tercile_cat, "<br>",
-                                   attr(to_map$y, "goodname"), ": ", to_map$y, "<br>",
+                                   attr(to_map$y, "goodname"), ": ", round(to_map$y, 2), "<br>",
                                    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Relative to other tracts: ", to_map$var2_tercile_cat))
     }
   })
