@@ -144,12 +144,12 @@ ui <- fluidPage(
                           fluidRow(
 
                             # base map selector
-                            column(3,
-                                   radioButtons(inputId = "base_map",
-                                                label = h4("Select a Base Map"),
-                                                choices = c("Minimal" = "CartoDB.Positron",
-                                                            "Detailed" = "OpenStreetMap.Mapnik"),
-                                                inline = TRUE)
+                            column(3
+                                   # , radioButtons(inputId = "base_map",
+                                   #              label = h4("Select a Base Map"),
+                                   #              choices = c("Minimal" = "CartoDB.Positron",
+                                   #                          "Detailed" = "OpenStreetMap.Mapnik"),
+                                   #              inline = TRUE)
                             ),
 
                             # locality selector
@@ -266,7 +266,7 @@ server <- function(input, output, session) {
   ## output map ----
   #build static parts of map, and display initial outline of region
   output$leaf <- renderLeaflet({
-    leaflet() %>% addProviderTiles(input$base_map) %>%
+    leaflet() %>% addProviderTiles('CartoDB.Positron') %>%
       addPolygons(data = geo, color = 'grey', opacity = 0) %>%
       setView(lng = -78.47668, lat = 38.02931, zoom = 9) %>%
       addLogo('bivariate_legend_static.svg', src = "remote",
@@ -301,7 +301,7 @@ server <- function(input, output, session) {
                       weight = 2,
                       fillOpacity = 0.8,
                       bringToFront = T),
-                    popup = paste0("Locality: ", to_map$countyname, ", ", to_map$tract, "<br>",
+                    popup = paste0("Locality: ", to_map$countyname, ", tract ", to_map$tract, "<br>",
                                    attr(to_map$x, "goodname"), ": ", round(to_map$x, 2),  "<br>",
                                    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Relative to other tracts: ", to_map$var1_tercile_cat, "<br>",
                                    attr(to_map$y, "goodname"), ": ", round(to_map$y, 2), "<br>",

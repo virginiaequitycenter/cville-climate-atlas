@@ -115,6 +115,7 @@ datatable(table,
             columnDefs = list(list(targets = c(1,2,3,4), width = '200px'),
                               list(targets = c(0,5,6), width = '150px')), # NOTE: After the Jeff exhibit, put `,7` back in after the `targets` argument
             pageLength = 8,
+            lengthMenu = c(8, 16, 24),
             scrollX = T,
             autoWidth = T), 
           escape = F)
