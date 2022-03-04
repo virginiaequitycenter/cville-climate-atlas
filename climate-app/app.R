@@ -1,7 +1,7 @@
 # ....................................
 # Begin Climate Equity Atlas Development
 # Authors: Michele Claibourn, others
-# Last updated: 2022-03-03 jacob-gg
+# Last updated: 2022-03-04 jacob-gg
 # ....................................
 
 # Phase 1a: added select indicators, output plotly scatterplot, add sample header
@@ -72,11 +72,11 @@ cant_map_message <- c("One of your selected variables cannot be rendered in the 
 
 # ....................................
 # Define User Interface ----
-ui <- fluidPage(  
+ui <- fluidPage(
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "style.css")
   ),
-  
+
   navbarPage(title = div(
     div(
       id = "img-id",
@@ -85,11 +85,11 @@ ui <- fluidPage(
     ),
     "Regional Climate Equity Atlas"
   ),
-                 
+
                  ## indicator selectors and plots ----
                  tabPanel("Main",
                           fluidRow(
-                            
+
                             # Sidebar for indicator 1
                             column(2,
                                    selectInput(inputId = "indicator1",
@@ -99,9 +99,9 @@ ui <- fluidPage(
                                    # variable definitions
                                    textOutput("ind1_defn"),
                                    textOutput("ind1_source")
-                                   
+
                             ),
-                            
+
                             # Place figures
                             column(8,
                                    tabsetPanel(type = "tabs",
@@ -124,7 +124,7 @@ ui <- fluidPage(
                                                         textOutput("var2_source"))
                                    )
                             ),
-                            
+
                             # Sidebar for indicator 2
                             column(2,
                                    selectInput(inputId = "indicator2",
@@ -134,15 +134,15 @@ ui <- fluidPage(
                                    # variable definitions
                                    textOutput("ind2_defn"),
                                    textOutput("ind2_source")
-                                   
+
                             )
                           ),
-                          
+
                           tags$hr(),
-                          
+
                           ## county/map/geography selector ----
                           fluidRow(
-                            
+
                             # base map selector
                             column(3,
                                    radioButtons(inputId = "base_map",
@@ -151,7 +151,7 @@ ui <- fluidPage(
                                                             "Detailed" = "OpenStreetMap.Mapnik"),
                                                 inline = TRUE)
                             ),
-                            
+
                             # locality selector
                             column(5,
                                    checkboxGroupInput(inputId = "locality",
@@ -166,11 +166,11 @@ ui <- fluidPage(
                                                                    "079", "109", "125"),
                                                       inline = TRUE)
                             )
-                            
+
                           )
-                          
+
                  ),
-                 
+
                  ## information navbars ----
                  tabPanel("Data Documentation",
                           #           includeHTML("cville_climate_update.html")
@@ -180,7 +180,7 @@ ui <- fluidPage(
                                                  frameBorder = "0")
                  ),
                  tabPanel("About"),
-                 
+
                  singleton(tags$head(tags$script(src = "message-handler.js")))
 ))
 
@@ -189,7 +189,7 @@ ui <- fluidPage(
 # ....................................
 # Define Server Logic ----
 server <- function(input, output, session) {
-  
+
   geo_data <- reactive({
     if (input$indicator1 == input$indicator2) {
       session$sendCustomMessage(type = 'testmessage',
@@ -207,7 +207,7 @@ server <- function(input, output, session) {
         drop_na()
     }
   })
-  
+
   ## output scatterplot ----
   output$scatterplot <- renderPlotly({
     if (input$indicator1 == input$indicator2 | length(input$locality) == 0) {
@@ -218,23 +218,27 @@ server <- function(input, output, session) {
                        type = "histogram", nbinsx = 20,
                        alpha =.75, color = I("grey")) %>%
         layout(yaxis = list(showgrid = FALSE,
-                            showticklabels = FALSE),
-               xaxis = list(showticklabels = FALSE))
-      
+                            showticklabels = FALSE,
+                            fixedrange = T),
+               xaxis = list(showticklabels = FALSE,
+                            fixedrange = T))
+
       yhist <- plot_ly(data = d, y = ~y,
                        type = "histogram", nbinsx = 20,
                        alpha = .75, color = I("grey")) %>%
         layout(xaxis = list(showgrid = FALSE,
-                            showticklabels = TRUE),
-               yaxis = list(showticklabels = FALSE))
-      
+                            showticklabels = TRUE,
+                            fixedrange = T),
+               yaxis = list(showticklabels = FALSE,
+                            fixedrange = T))
+
       xyscatter <- plot_ly(data = d, x = ~x, y = ~y,
                            type = "scatter",
                            mode = 'markers', # to remove mode warning
                            fill = ~'', # to remove line.width error
-                           size = ~pop, 
+                           size = ~pop,
                            sizes = c(1, 500),
-                           color = ~countyname, 
+                           color = ~countyname,
                            colors = fewpal,
                            alpha = .75,
                            text = paste0("Locality: ", d$countyname, "<br>",
@@ -243,10 +247,10 @@ server <- function(input, output, session) {
                                          attr(d$x, "goodname"), ": ", round(d$x, 2), "<br>",
                                          attr(d$y, "goodname"), ": ", round(d$y, 2), "<br>"),
                            hoverinfo = "text") %>%
-        layout(xaxis = list(title = attr(d$x, "goodname"), showticklabels = TRUE),
-               yaxis = list(title = attr(d$y, "goodname"), showticklabels = TRUE),
+        layout(xaxis = list(title = attr(d$x, "goodname"), showticklabels = TRUE, fixedrange = T),
+               yaxis = list(title = attr(d$y, "goodname"), showticklabels = TRUE, fixedrange = T),
                legend = list(orientation = "h", x = 0, y = -0.2))
-      
+
       # note: in the legend, we hide trace 1 (the xhist) and trace (3 + length(input$locality)), which is the yhist;
       #       the yhist's trace # changes as a user selects different localities to map, but it can be dynamically
       #       referenced as... yhist trace number = 1 (xhist) + 1 (plotly_empty) + n_localities + 1 (to reach the yhist)
@@ -258,7 +262,7 @@ server <- function(input, output, session) {
                yaxis2 = list(showgrid = TRUE))
     }
   })
-  
+
   ## output map ----
   #build static parts of map, and display initial outline of region
   output$leaf <- renderLeaflet({
@@ -304,7 +308,7 @@ server <- function(input, output, session) {
                                    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Relative to other tracts: ", to_map$var2_tercile_cat))
     }
   })
-  
+
   ## output tercile plot ----
   output$tercile_plot <- renderPlotly({
     if (input$indicator1 %in% cant_map | input$indicator2 %in% cant_map | input$indicator1 == input$indicator2 | length(input$locality) == 0) {
@@ -312,7 +316,7 @@ server <- function(input, output, session) {
     } else {
       to_tercile <- bi_class(geo_data(), x = x, y = y, style = "quantile", dim = 3)
       to_tercile$var1_tercile <- stri_extract(to_tercile$bi_class, regex = '^\\d{1}(?=-\\d)')
-      
+
       to_tercile$`Var 1 Group` <- ifelse(to_tercile$var1_tercile == 1, 'Low', ifelse(to_tercile$var1_tercile == 2, 'Medium', ifelse(to_tercile$var1_tercile == 3, 'High', '')))
       to_tercile <- to_tercile %>% group_by(var1_tercile) %>% mutate(`Var 2 Mean` = mean(y, na.rm = T)) %>% slice(1)
       t <- ggplot(to_tercile, aes(x = var1_tercile, y = `Var 2 Mean`,
@@ -324,65 +328,65 @@ server <- function(input, output, session) {
         labs(x = attr(to_tercile$x, "goodname"),
              y = attr(to_tercile$y, "goodname")) +
         theme_minimal()
-      
+
       ggplotly(t, tooltip = c('text')) %>%
-        layout(showlegend = FALSE, yaxis = list(side = "right"))
-      
+        layout(showlegend = FALSE, yaxis = list(side = "right", fixedrange = T), xaxis = list(fixedrange = T))
+
     }
   })
-  
+
   ## output variable information ----
-  
+
   # by selector
   # indicator 1
   output$ind1_defn <- renderText({
     attr(geo_data()$x, "description")
   })
-  
+
   output$ind1_source <- renderText({
     paste("Source: ", attr(geo_data()$x, "source"))
   })
-  
+
   # indicator 2
   output$ind2_defn <- renderText({
     attr(geo_data()$y, "description")
   })
-  
+
   # indicator 2 description by selector
   output$ind2_source <- renderText({
     paste("Source: ", attr(geo_data()$y, "source"))
   })
-  
+
   # detailed var info on var info tab
   # indicator 1
   output$var1_name <- renderText({
     attr(geo_data()$x, "goodname")
   })
-  
+
   output$var1_abt <- renderText({
     attr(geo_data()$x, "about")
   })
-  
+
   output$var1_source <- renderText({
     paste("Source: ", attr(geo_data()$x, "source"))
   })
-  
+
   # indicator 2
   output$var2_name <- renderText({
     attr(geo_data()$y, "goodname")
   })
-  
+
   output$var2_abt <- renderText({
     attr(geo_data()$y, "about")
   })
-  
+
   output$var2_source <- renderText({
     paste("Source: ", attr(geo_data()$y, "source"))
   })
-  
+
   ## about page ----
   # output$documentation <- renderUI(htmltools::includeHTML("cville_climate_update.html"))
-  
+
 }
 # Run the application ----
 shinyApp(ui = ui, server = server)
