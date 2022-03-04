@@ -1,11 +1,15 @@
 ---
-title: "Local Heat & Islands"
+title: "Local Heat & Heat Islands"
 author:
   - Equity Center Democratization of Data Team - Michele Claibourn, Chase Dawson, Michael Salgueiro
   - Project Pipeline Leads - Carmen Wright, Gabe Andrade, Zymir Faulkner 
   - UVA School of Architecture Project Pipeline Youth Design Mentorship Program Youth Participants
 output: 
   html_document:
+    includes:
+      before_body: logo-home.html
+      after_body: logo-home.html
+    css: style.css
     toc: true
     toc_float: true
     toc_depth: 2
@@ -31,6 +35,8 @@ localities <- data.frame(
                "Greene", "Louisa", "Nelson"))
 
 ```
+
+<br>
 
 In Summer 2021, the UVA School of Architecture Project Pipeline Youth Design Mentorship Program participants learned about the heat island effect. The youth participants then produced digital art displaying the local impacts of the heat island effect and other climate-change related impacts in their community. 
 
@@ -140,7 +146,7 @@ Heat islands are most frequently analyzed using satellite imagery data, like the
 
 Daytime land surface temperature measurements like these are typically higher than the air temperature felt by 
 
-```{r heatepa, out.width='80%', fig.align='center', fig.cap="Source: EPA, Learn about Heat Islands (https://www.epa.gov/heatislands/learn-about-heat-islands)"}
+```{r heatepa, out.width='5 0%', fig.align='center', fig.cap="Source: EPA, Learn about Heat Islands (https://www.epa.gov/heatislands/learn-about-heat-islands)"}
 include_graphics("image/heatisland_epa2.png")
 ```
 
