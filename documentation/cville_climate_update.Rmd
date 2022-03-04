@@ -31,6 +31,9 @@ table <- read_sheet("https://docs.google.com/spreadsheets/d/1vfuiVf_aQikUNd7OW7T
 
 table <- table %>% 
   select(Topics, `Data Source`, `Key Metrics`, `Example Questions`, `Spatial Unit`, Year, Documentation)
+########## NOTE: Remove the code below after the Jeff exhibit ########## 
+table <- table %>% select(-Documentation)
+########################################################################
 ```
 
 <br>
@@ -57,7 +60,7 @@ While continuing to add to the current data collections and clean up and refine 
 ----
 
 ## <a id="collection"></a>Newly Available Data Collections
-To build on the the population data we've collected as part of the broader [Equity Atlas Prototype](https://virginiaequitycenter.shinyapps.io/cville-https://virginiaequitycenter.shinyapps.io/cville_equity_atlas/) (e.g., demographic, economic, health, and other social data) and [Shelter in Place](https://virginiaequitycenter.github.io/cvilleequity_covid/SIP/) measures (e.g., food, car, broadband access), the table below provides an overview of the data collections, including data sources, key measures, and motivating questions. The table can be filtered for key topics (climate measures, risk factors, community assets and infrastructure, transportation). 
+The table below provides an overview of the data collections, including data sources, key measures, and motivating questions. The table can be filtered for key topics (climate measures, risk factors, community assets and infrastructure, transportation). 
 
 ```{r}
 img_uri <- function(x) { sprintf('<img src="%s"/ height="50">', knitr::image_uri(x)) }
@@ -85,11 +88,12 @@ for (z in 1:nrow(table)) {
 
 <details><summary>Click to see Topic Icon details</summary><br/>
 
-* Climate measures, `r c`: https://www.flaticon.com/authors/ultimatearm
-* Risk factors, `r r`: https://www.freepik.com
-* Community assets and infrastructure, `r i`: https://www.flaticon.com/authors/eucalyp
-* Social and economic characteristics, `r e`: https://www.flaticon.com/authors/ultimatearm
-* Transportation, `r t`: https://www.flaticon.com/authors/geotatah
+<!-- NOTE: After the Jeff exhibit, remove <nolink> tags from URLs below in order to hyperlink them once again -->
+* Climate measures, `r c`: https<nolink>://www.flaticon.com/authors/ultimatearm
+* Risk factors, `r r`: https<nolink>://www.freepik.com
+* Community assets and infrastructure, `r i`: https<nolink>://www.flaticon.com/authors/eucalyp
+* Social and economic characteristics, `r e`: https<nolink>://www.flaticon.com/authors/ultimatearm
+* Transportation, `r t`: https<nolink>://www.flaticon.com/authors/geotatah
 
 </details>
 
@@ -109,7 +113,7 @@ td{
 datatable(table,
           filter = 'top', rownames = F, options = list(
             columnDefs = list(list(targets = c(1,2,3,4), width = '200px'),
-                              list(targets = c(0,5,6,7), width = '150px')),
+                              list(targets = c(0,5,6), width = '150px')), # NOTE: After the Jeff exhibit, put `,7` back in after the `targets` argument
             pageLength = 8,
             scrollX = T,
             autoWidth = T), 
