@@ -1,0 +1,23 @@
+body {
+  font-family: Verdana,sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+h4.author {
+	font-size: 16px;
+	color: #2171b5;
+}
+
+/* change toc color */
+.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
+    z-index: 2;
+    color: #fff;
+    background-color: #2171b5;
+    border-color: #2171b5;
+}
+
+/* add padding to home/image */
+.home-style {
+  padding: 20px;
+}
