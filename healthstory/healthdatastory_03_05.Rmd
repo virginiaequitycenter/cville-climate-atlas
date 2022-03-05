@@ -26,27 +26,27 @@ invisible(lapply(list('tidyverse', 'cartogram', 'broom', 'tweenr', 'gganimate',
 
 
 # load data
-popdat <- read.csv("acs_tract_cville.csv")
+popdat <- read.csv("../data-csv/acs_tract_cville.csv")
 
-shape <- readRDS('cville_tracts.RDS')
+shape <- readRDS('../data-csv/cville_tracts.RDS')
 shape$GEOID <- as.numeric(shape$GEOID)
 shape <- st_transform(shape, crs = 6639)
 
-healthdat <- read.csv("cdcplaces_cville_tract.csv")
+healthdat <- read.csv("../data-csv/cdcplaces_cville_tract.csv")
 healthdat <- healthdat %>%
   rename(GEOID = locationname)
-air <- read.csv("airquality_cville_tract.csv")
+air <- read.csv("../data-csv/airquality_cville_tract.csv")
 air <- air %>%
   rename(GEOID = gid)
 
 
-edat <- read.csv('lodes_employment_cville_tracts.csv')
+edat <- read.csv('../data-csv/lodes_employment_cville_tract.csv')
 edat <- edat %>%
   rename(GEOID = w_tract)
 
-lead <- read.csv("leadexposure_cville_tract.csv")
+lead <- read.csv("../data-csv/leadexposure_cville_tract.csv")
 
-surface <- read.csv("landsat8_cville_tracts.csv")
+surface <- read.csv("../data-csv/landsat8_cville_tract.csv")
 surface <- surface %>% 
   filter(start_date == as.Date("2020-07-04")) %>% 
   mutate(med_dev = median - mean(median))
