@@ -44,9 +44,7 @@ mentalhealthplot <- dat %>%
   geom_bar(position = "dodge", stat = "summary", fun = "mean", na.rm = T) + 
   scale_fill_manual(labels = c("low-poverty", "mid-poverty", "high-poverty"),
                     values = c('coral2', 'cornflowerblue', 'plum4')) + 
-  labs(x = "Poverty rank", y = "% of population with poor mental health") # I'm assuming we can use the paste function 
-# or something here to generate labels based on whatever variables are selected in the shiny app but 
-# I'm not exactly sure how you do that 
+  labs(x = "Poverty rank", y = "% of population with poor mental health") 
 
 # ...........................
 # mpc added
