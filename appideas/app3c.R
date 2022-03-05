@@ -26,8 +26,7 @@
 #    made leaflet and plotly output plots taller (height = '500')
 #    removed detailed base map, 
 #    make variable description text slightly smaller, all other text slightly bigger
-#    add space to variable details, add plot orientation language
-#    add refresh button
+#    add space to variable details
 
 # To do
 #    add about info, front page narrative for interpretation?;
@@ -77,10 +76,7 @@ cant_map_message <- c("One of your selected variables cannot be rendered in the 
 # ....................................
 # Define User Interface ----
 ui <- fluidPage(
-  #includeCSS("www/addstyle.css"),
-  tags$head(
-    tags$link(rel = "stylesheet", type = "text/css", href = "style.css")
-  ),
+  includeCSS("www/style.css"),
   
   navbarPage(title = div(
     div(
@@ -93,10 +89,8 @@ ui <- fluidPage(
 
                  ## indicator selectors and plots ----
                  tabPanel("Main",
-                          # global instructions
-                          tags$div(style='font-size:15px; font-weight:bold;', tags$p("Select any two measures from the dropdown menus on the left and right side of the screen to see the relationship between the measures in census tracts across the Greater Charlottesville Region. Then use the sheet beside this computer to share your thoughts about patterns you find or new datasets that should be included in the future!")),
-                          
                           fluidRow(
+
                             # Sidebar for indicator 1
                             column(2,
                                    selectInput(inputId = "indicator1",
@@ -104,24 +98,24 @@ ui <- fluidPage(
                                                choices = ind_demfirst_ct,
                                                selected = ind_demfirst_ct$`Demographic & Social`["Estimated Population"]),
                                    # variable definitions
-                                   span(textOutput("ind1_defn"), style='font-size:13px'),
+                                   span(textOutput("ind1_defn"), style='size:12px'),
                                    tags$br(),
-                                   span(textOutput("ind1_source"), style='font-size:13px'),
+                                   span(textOutput("ind1_source"), style='side:12px'),
                             ),
 
                             # Place figures
                             column(8,
                                    tabsetPanel(type = "tabs",
                                                tabPanel(title = 'Map', 
-                                                        tags$div(style="font-size:13px", tags$p("Each census tract is ranked from Low to High on the measures you select from the left (Variable 1) and the right (Variable 2). The legend in the upper left corner of the map provides a key for what each color represents. Zoom in to see specific areas more closely or zoom out to see the full region. Click on specific tracts to see the values for each measure, as well as how the tract ranks (Low, Medium, High) relative to others in the selected region.")),
-                                                        leafletOutput(outputId = 'leaf', width = '100%', height = '450')
+                                                        tags$div(style="font-size:12px", tags$p("Each census tract is ranked from Low to High on the measures you select from the left (Variable 1) and the right (Variable 2). The legend in the upper left corner of the map provides a key for what each color represents. Zoom in to see specific areas more closely or zoom out to see the full region. Click on specific tracts to see the values for each measure, as well as how the tract ranks (Low, Medium, High) relative to others in the selected region.")),
+                                                        leafletOutput(outputId = 'leaf', width = '100%', height = '500')
                                                ),
                                                tabPanel(title = "Correlation",
-                                                        tags$div(style="font-size:13px", tags$p("Each census tract in the Charlottesville region is represented with a dot, plotted by the value of the tract on the measures you select on the left (Variable 1) and the right (Variable 2). The size of each dot is based on the population of the tract so that-tracts with more people appear larger and the color is based on the locality of the tract. The gray figures on the top and right show how frequently high and low values of the selected variables occur in the region; taller bars mean that range of values is more common.")),
-                                                        plotlyOutput(outputId = "scatterplot", width = '100%', height = '450')
+                                                        tags$div(style="font-size:12px", tags$p("Each census tract in the Charlottesville region is represented with a dot, plotted by the value of the tract on the measures you select on the left (Variable 1) and the right (Variable 2). The size of each dot is based on the population of the tract so that-tracts with more people appear larger and the color is based on the locality of the tract. The gray figures on the top and right show how frequently high and low values of the selected variables occur in the region; taller bars mean that range of values is more common.")),
+                                                        plotlyOutput(outputId = "scatterplot", width = '100%', height = '500')
                                                ),
                                                tabPanel(title = "Differences",
-                                                        tags$div(style="font-size:13px", tags$p("Each census tract in the selected Charlottesville region is ranked into three groups representing tracts with Low, Middle, or High values on the measure you select on the left (Variable 1). The height of the bar shows the average value of the measure you select on the right (Variable 2) within that group of tracts. Hover over each bar to see the average value on Variable 2.")),
+                                                        tags$div(style="font-size:12px", tags$p("Each census tract in the selected Charlottesville region is ranked into three groups representing tracts with Low, Middle, or High values on the measure you select on the left (Variable 1). The height of the bar shows the average value of the measure you select on the right (Variable 2) within that group of tracts. Hover over each bar to see the average value on Variable 2.")),
                                                         plotlyOutput(outputId = 'tercile_plot')
                                                ),
                                                tabPanel(title = "Variable Details",
@@ -143,9 +137,9 @@ ui <- fluidPage(
                                                choices = ind_climfirst_ct,
                                                selected = ind_climfirst_ct$`Climate Measures`["Average Land Surface Temperature"]),
                                    # variable definitions
-                                   span(textOutput("ind2_defn"), style='font-size:13px'),
+                                   span(textOutput("ind2_defn"), style='12px'),
                                    tags$br(),
-                                   span(textOutput("ind2_source"), style='font-size:13px')
+                                   span(textOutput("ind2_source"), style='12px')
                             )
                           ),
 
@@ -155,8 +149,7 @@ ui <- fluidPage(
                           fluidRow(
 
                             # base map selector
-                            column(3,
-                                   actionButton(inputId = "refresh", "Refresh Atlas")
+                            column(3
                                    # , radioButtons(inputId = "base_map",
                                    #              label = h4("Select a Base Map"),
                                    #              choices = c("Minimal" = "CartoDB.Positron",
@@ -165,7 +158,7 @@ ui <- fluidPage(
                             ),
 
                             # locality selector
-                            column(6,
+                            column(5,
                                    checkboxGroupInput(inputId = "locality",
                                                       label = h4("Select Localities"),
                                                       choices = c("Albemarle" = "003",
@@ -347,9 +340,6 @@ server <- function(input, output, session) {
     }
   })
 
-  ## refresh app
-  observeEvent(input$refresh, session$reload())
-  
   ## output variable information ----
 
   # by selector
@@ -402,6 +392,6 @@ server <- function(input, output, session) {
   ## about page ----
   # output$documentation <- renderUI(htmltools::includeHTML("cville_climate_update.html"))
 
-  }
+}
 # Run the application ----
 shinyApp(ui = ui, server = server)

@@ -24,6 +24,8 @@
 #    moved logo into navbar
 #    reduced tercile bar width
 #    made leaflet and plotly output plots taller (height = '500')
+#    make variable description text slightly smaller, all other text slightly bigger
+#    add space to variable details
 
 # To do
 #    add about info, front page narrative for interpretation?;
@@ -73,10 +75,8 @@ cant_map_message <- c("One of your selected variables cannot be rendered in the 
 # ....................................
 # Define User Interface ----
 ui <- fluidPage(  
-  tags$head(
-    tags$link(rel = "stylesheet", type = "text/css", href = "style.css")
-  ),
-  
+  includeCSS("www/style.css"),
+
   navbarPage(title = div(
     div(
       id = "img-id",
@@ -97,9 +97,9 @@ ui <- fluidPage(
                                                choices = ind_demfirst_ct,
                                                selected = ind_demfirst_ct$`Demographic & Social`["Estimated Population"]),
                                    # variable definitions
-                                   textOutput("ind1_defn"),
-                                   textOutput("ind1_source")
-                                   
+                                   span(textOutput("ind1_defn"), style='size:11px'),
+                                   br(),
+                                   span(textOutput("ind1_source"), style='side:11px')
                             ),
                             
                             # Place figures
@@ -115,6 +115,7 @@ ui <- fluidPage(
                                                         plotlyOutput(outputId = 'tercile_plot')
                                                ),
                                                tabPanel(title = "Variable Details",
+                                                        br(),
                                                         strong(textOutput("var1_name")),
                                                         textOutput("var1_abt"),
                                                         textOutput("var1_source"),
@@ -125,6 +126,7 @@ ui <- fluidPage(
                                    )
                             ),
                             
+                            
                             # Sidebar for indicator 2
                             column(2,
                                    selectInput(inputId = "indicator2",
@@ -132,9 +134,9 @@ ui <- fluidPage(
                                                choices = ind_climfirst_ct,
                                                selected = ind_climfirst_ct$`Climate Measures`["Average Land Surface Temperature"]),
                                    # variable definitions
-                                   textOutput("ind2_defn"),
-                                   textOutput("ind2_source")
-                                   
+                                   span(textOutput("ind2_defn"), style='11px'),
+                                   br(),
+                                   span(textOutput("ind2_source"), style='11px')
                             )
                           ),
                           
