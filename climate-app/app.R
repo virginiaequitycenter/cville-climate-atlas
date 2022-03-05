@@ -1,7 +1,7 @@
 # ....................................
 # Begin Climate Equity Atlas Development
-# Authors: Michele Claibourn, others
-# Last updated: 2022-03-04 jacob-gg
+# Authors: Michele Claibourn, Jacob Goldstein-Greenwood, Lee LeBoeuf
+# Last updated: 2022-03-05 mpc
 # ....................................
 
 # Phase 1a: added select indicators, output plotly scatterplot, add sample header
@@ -23,22 +23,16 @@
 #    update data documentation (reduced)
 #    moved logo into navbar
 #    reduced tercile bar width
-#    made leaflet and plotly output plots taller (height = '500')
+#    made leaflet and plotly output plots taller (height = '450')
 #    removed detailed base map, 
 #    make variable description text slightly smaller, all other text slightly bigger
-#    add space to variable details, add plot orientation language
+#    add space to variable details, add plot orientation language, add global instructions
 #    add refresh button
 
 # To do
-#    add about info, front page narrative for interpretation?;
-#    add short instructional bits for each element?
-#    customize theming/color/aesthetic elements
 #    ?add layering points (parks, schools, food retailers)
-#    ?add block group data and selector for geography (in fluid row 2)
+#    ?add block group data and selector for geography
 #    ?add county or block level data?
-#    ?add component-wise helper information?
-
-# consider pulling out/chunking up and source some stuff...programming improvements
 
 # ....................................
 # Load libraries and data
@@ -56,10 +50,6 @@ library(htmltools)
 
 load("data/cvl_dat.RData")
 # data prepared in combine_data.R
-# geo <- geo %>% select(locality, geoid, geometry)
-
-# df <- readRDS("data/cvl_data.RDS")
-# varlist <- df %>% select(where(is.numeric), -pop) %>% names()
 
 # create palette for use in bichoropleth palette function
 bipal <- c("#e8e8e8", "#dfd0d6", "#be64ac", # A-1, A-2, A-3,
@@ -77,7 +67,6 @@ cant_map_message <- c("One of your selected variables cannot be rendered in the 
 # ....................................
 # Define User Interface ----
 ui <- fluidPage(
-  #includeCSS("www/addstyle.css"),
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "style.css")
   ),
@@ -88,11 +77,11 @@ ui <- fluidPage(
       img(src = "ec_climate_logo.png",
           height = 50)
     ),
-    "Regional Climate Equity Atlas"
+    "Charlottesville Regional Climate Equity Atlas"
   ),
 
                  ## indicator selectors and plots ----
-                 tabPanel("Main",
+                 tabPanel("Atlas",
                           # global instructions
                           tags$div(style='font-size:15px; font-weight:bold;', tags$p("Select any two measures from the dropdown menus on the left and right side of the screen to see the relationship between the measures in census tracts across the Greater Charlottesville Region. Then use the sheet beside this computer to share your thoughts about patterns you find or new datasets that should be included in the future!")),
                           
@@ -117,7 +106,7 @@ ui <- fluidPage(
                                                         leafletOutput(outputId = 'leaf', width = '100%', height = '450')
                                                ),
                                                tabPanel(title = "Correlation",
-                                                        tags$div(style="font-size:13px", tags$p("Each census tract in the Charlottesville region is represented with a dot, plotted by the value of the tract on the measures you select on the left (Variable 1) and the right (Variable 2). The size of each dot is based on the population of the tract so that-tracts with more people appear larger and the color is based on the locality of the tract. The gray figures on the top and right show how frequently high and low values of the selected variables occur in the region; taller bars mean that range of values is more common.")),
+                                                        tags$div(style="font-size:13px", tags$p("Each census tract in the Charlottesville region is represented with a dot, plotted by the value of the tract on the measures you select on the left (Variable 1) and the right (Variable 2). The size of each dot is based on the population of the tract so that tracts with more people appear larger and the color is based on the locality of the tract. The gray figures on the top and right show how frequently high and low values of the selected variables occur in the region; taller bars mean that range of values is more common.")),
                                                         plotlyOutput(outputId = "scatterplot", width = '100%', height = '450')
                                                ),
                                                tabPanel(title = "Differences",
@@ -154,9 +143,10 @@ ui <- fluidPage(
                           ## county/map/geography selector ----
                           fluidRow(
 
-                            # base map selector
+                            # refresh button
                             column(3,
                                    actionButton(inputId = "refresh", "Refresh Atlas")
+                                   # base map selector (needs troubleshooting)
                                    # , radioButtons(inputId = "base_map",
                                    #              label = h4("Select a Base Map"),
                                    #              choices = c("Minimal" = "CartoDB.Positron",
@@ -178,20 +168,24 @@ ui <- fluidPage(
                                                                    "079", "109", "125"),
                                                       inline = TRUE)
                             )
-
                           )
-
                  ),
 
                  ## information navbars ----
                  tabPanel("Data Documentation",
-                          #           includeHTML("cville_climate_update.html")
-                          # uiOutput("documentation"),
+                          # includeHTML("cville_climate_update.html") # table not displaying
+                          # uiOutput("documentation") # table not displaying
                           htmltools::tags$iframe(src = 'cville_climate_update.html',
                                                  style='width:100vw;height:100vh;',
                                                  frameBorder = "0")
                  ),
-                 tabPanel("About"),
+
+                   tabPanel("About",
+                            #includeHTML("www/about_work.html")
+                            htmltools::tags$iframe(src = 'about_work.html',
+                                                   style='width:100vw;height:100vh;',
+                                                   frameBorder = "0")
+                            ),
 
                  singleton(tags$head(tags$script(src = "message-handler.js")))
 ))
@@ -347,7 +341,7 @@ server <- function(input, output, session) {
     }
   })
 
-  ## refresh app
+  ## refresh app ----
   observeEvent(input$refresh, session$reload())
   
   ## output variable information ----

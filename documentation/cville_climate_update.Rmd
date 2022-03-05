@@ -2,8 +2,10 @@
 title: "Climate Equity Atlas: Data Documentation"
 author: 
   - 2021-2022 Equity Center Data Team
-  - Michele Claibourn (Director of Equitable Analysis), Chase Dawson, Jacob Goldstein-Greenwood, Jordan House, Khalila Karefa-Kargbo, Lee LeBoeuf, Marisa Lemma, Helena Lindsay, Tolu Odukoya, Michael Salgueiro (Research Programs Manager)
-output: html_document
+  - Michele Claibourn, Chase Dawson, Jacob Goldstein-Greenwood, Jordan House, Khalila Karefa-Kargbo, Lee LeBoeuf, Marisa Lemma, Helena Lindsay, Tolu Odukoya, Michael Salgueiro
+output: 
+  html_document:
+    css: style.css
 ---
 
 
