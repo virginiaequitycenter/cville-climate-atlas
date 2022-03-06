@@ -5,7 +5,6 @@ output:
   html_document:
     includes:
       before_body: logo-home.html
-      after_body: logo-home.html
     css: style.css
     toc: true
     toc_float: true
