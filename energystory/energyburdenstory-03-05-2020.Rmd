@@ -113,7 +113,8 @@ povplot <- dat2 %>%
   scale_fill_manual(labels = c("Lowest", "Middle", "Highest"),
                     values = c("#a5add3", "#dfd0d6", "#5698b9"),
                     name = "Rank") + 
-  scale_y_continuous(labels = label_percent(scale = 1)) +
+  scale_y_continuous(labels = label_percent(scale = 1), 
+                     limits = c(0,40)) +
   scale_x_discrete(labels = paste0(c('Lowest ', 'Middle ', 'Highest '))) +
   labs(x = "% in poverty", y = "% of burdened households") + theme_bw()
 
@@ -138,7 +139,8 @@ employplot <- dat6 %>%
                     values = c("#a5add3", "#dfd0d6", "#5698b9"),
                     name = "Rank", 
                     guide = "none") + 
-  scale_y_continuous(labels = label_percent(scale = 1)) +
+  scale_y_continuous(labels = label_percent(scale = 1), 
+                     limits = c(0,40)) +
   scale_x_discrete(labels = paste0(c('Lowest ', 'Middle ', 'Highest '))) +
   labs(x = "% unemployed", y = "") + theme_bw()
 
@@ -163,7 +165,8 @@ incomeplot <- dat7 %>%
                     values = c("#a5add3", "#dfd0d6", "#5698b9"),
                     name = "Median household income rank",
                     guide = "none") + 
-  scale_y_continuous(labels = label_percent(scale = 1)) +
+  scale_y_continuous(labels = label_percent(scale = 1),
+                     limits = c(0,40)) +
   scale_x_discrete(labels = paste0(c('Lowest ', 'Middle ', 'Highest '))) +
   labs(x = "Median household income", y = "") + theme_bw()
 
@@ -201,7 +204,8 @@ bipocplot <- dat8 %>%
   scale_fill_manual(labels = c("low", "mid", "high"),
                     values = c("#a5add3", "#dfd0d6", "#5698b9"),
                     name = "Rank") + 
-  scale_y_continuous(labels = label_percent(scale = 1)) +
+  scale_y_continuous(labels = label_percent(scale = 1),
+                     limits = c(0,40)) +
   scale_x_discrete(labels = paste0(c('Lowest ', 'Middle ', 'Highest '))) +
   labs(x = "% BIPOC", y = "% of burdened households") + theme_bw()
 
@@ -225,7 +229,8 @@ raceplot <- dat4 %>%
                     values = c("#a5add3", "#dfd0d6", "#5698b9"),
                     name = "Rank",
                     guide = "none") + 
-  scale_y_continuous(labels = label_percent(scale = 1)) +
+  scale_y_continuous(labels = label_percent(scale = 1),
+                     limits = c(0,40)) +
   scale_x_discrete(labels = paste0(c('Lowest ', 'Middle ', 'Highest '))) +
   labs(x = "% Black", y = "") + theme_bw()
 
@@ -249,7 +254,8 @@ whiteplot <- dat9 %>%
                     values = c("#a5add3", "#dfd0d6", "#5698b9"),
                     name = "Rank", 
                     guide = "none") + 
-  scale_y_continuous(labels = label_percent(scale = 1)) +
+  scale_y_continuous(labels = label_percent(scale = 1),
+                     limits = c(0,40)) +
   scale_x_discrete(labels = paste0(c('Lowest ', 'Middle ', 'Highest '))) +
   labs(x = "% White", y = "") + theme_bw()
 
@@ -487,3 +493,7 @@ leaflet() %>%
 * Census Bureau's American Community Survey 5-Year Estimates from 2015-2019
 
 </details> 
+
+## Learn more
+
+For an in-depth look at energy burden in the city of Charlottesville and solutions, view the Community Climate Collaborative's work on energy inequity in Charlottesville: https<nolink>://theclimatecollaborative.org/uncovering-energy-inequity

@@ -39,7 +39,6 @@ air <- read.csv("../data-csv/airquality_cville_tract.csv")
 air <- air %>%
   rename(GEOID = gid)
 
-
 edat <- read.csv('../data-csv/lodes_employment_cville_tract.csv')
 edat <- edat %>%
   rename(GEOID = w_tract)
@@ -77,7 +76,6 @@ Demographic characteristics -- characteristics of people like age or income -- a
 Some relationships, or correlations, between population characteristics and health outcomes are unavoidable. For example, as people age, their risk of developing cancer increases. So communities with more residents who are 65 and older also tend to have more residents who have been diagnosed with cancer than younger communities. You can see this clearly in the scatter plot of Charlottesville Region census tracts below.[^5] 
 
 ```{r}
-
 xyscatter <- plot_ly(data = cdat, x = cdat$age65E, y = cdat$Cancer_except_skin2018,
                      type = "scatter",
                      mode = "markers",
@@ -403,7 +401,8 @@ mentalhealthplot <- dat2 %>%
   scale_fill_manual(labels = c("low-income", "mid-income", "high-income"),
                     values = c('#22A884FF', '#414487FF', '#440154FF'),
                     name = "Household income rank") + 
-  labs(x = "Rank", y = "% of population with poor mental health")
+  labs(x = "Income Rank", y = "% of population with poor mental health",
+       subtitle = "% Poor Mental Health\n by Area Income")
 
 dat4 <- dat1 %>%  
   dplyr::select(totalpopE, Current_Asthma2018, incrank) %>%
@@ -420,7 +419,8 @@ asthmaplot <- dat4 %>%
   scale_fill_manual(labels = c("low-income", "mid-income", "high-income"),
                     values = c('#22A884FF', '#414487FF', '#440154FF'),
                     name = "Household income rank") + 
-  labs(x = "Rank", y = "% of population with asthma")
+  labs(x = "Income Rank", y = "% of population with asthma",
+       subtitle = "% Asthma\n by Area Income")
 
 dat6 <- dat1 %>%  
   dplyr::select(totalpopE, Physical_Health2018, incrank) %>%
@@ -437,7 +437,8 @@ physicalhealthplot <- dat6 %>%
   scale_fill_manual(labels = c("low-income", "mid-income", "high-income"),
                     values = c('#22A884FF', '#414487FF', '#440154FF'),
                     name = "Household income rank") + 
-  labs(x = "Rank", y = "% of population with poor physical health")
+  labs(x = "Income Rank", y = "% of population with poor physical health",
+       subtitle = "% Poor Physical Health\n by Area Income")
 
 ggarrange(physicalhealthplot, mentalhealthplot, asthmaplot, ncol = 3, common.legend = TRUE)
 ```
