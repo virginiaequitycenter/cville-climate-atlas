@@ -353,7 +353,7 @@ legend2 <- ggplot() +
   coord_fixed()
 
 # Jacob's fix for the legend
-ggsave(plot = legend2, filename = "image/bivariate_legend.svg",
+ggsave(plot = legend2, filename = "bivariate_legend.svg",
        width = 1, height = 1)
 
 addLocalLogo <- function(map,
@@ -480,7 +480,7 @@ leaflet() %>%
                              round(cvlshapes$percentburdened, 2), "<br>",
                              "Average Max July Temp: ", 
                              round(cvlshapes$July_AvgMaxTF, 1))) %>% 
-    addLocalLogo("image/bivariate_legend.svg", src = "local",
+    addLocalLogo("bivariate_legend.svg", src = "local",
           position = "topright", width = 100, height = 100,
           alpha = 0.8)
 ```

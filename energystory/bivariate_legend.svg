@@ -9,6 +9,9 @@
       stroke-linejoin: round;
       stroke-miterlimit: 10.00;
     }
+    .svglite text {
+      white-space: pre;
+    }
   ]]></style>
 </defs>
 <rect width='100%' height='100%' style='stroke: none; fill: none;'/>
@@ -20,25 +23,25 @@
 <g clip-path='url(#cpMC4wMHw3Mi4wMHwwLjAwfDcyLjAw)'>
 </g>
 <defs>
-  <clipPath id='cpNi45OHw3Mi4wMHwwLjk5fDY0LjA0'>
-    <rect x='6.98' y='0.99' width='65.02' height='63.05' />
+  <clipPath id='cpNi45Nnw3MS45OHwwLjAwfDY1LjAy'>
+    <rect x='6.96' y='0.00' width='65.02' height='65.02' />
   </clipPath>
 </defs>
-<g clip-path='url(#cpNi45OHw3Mi4wMHwwLjk5fDY0LjA0)'>
-<rect x='49.34' y='2.96' width='19.70' height='19.70' style='stroke-width: 0.21; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #3B4994;' />
-<rect x='29.64' y='2.96' width='19.70' height='19.70' style='stroke-width: 0.21; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #8C62AA;' />
-<rect x='9.93' y='2.96' width='19.70' height='19.70' style='stroke-width: 0.21; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #BE64AC;' />
-<rect x='49.34' y='22.66' width='19.70' height='19.70' style='stroke-width: 0.21; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #5698B9;' />
-<rect x='29.64' y='22.66' width='19.70' height='19.70' style='stroke-width: 0.21; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #A5ADD3;' />
-<rect x='9.93' y='22.66' width='19.70' height='19.70' style='stroke-width: 0.21; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #DFD0D6;' />
-<rect x='49.34' y='42.36' width='19.70' height='19.70' style='stroke-width: 0.21; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #5AC8C8;' />
-<rect x='29.64' y='42.36' width='19.70' height='19.70' style='stroke-width: 0.21; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #ACE4E4;' />
-<rect x='9.93' y='42.36' width='19.70' height='19.70' style='stroke-width: 0.21; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #E8E8E8;' />
+<g clip-path='url(#cpNi45Nnw3MS45OHwwLjAwfDY1LjAy)'>
+<rect x='49.32' y='2.96' width='19.70' height='19.70' style='stroke-width: 0.21; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #3B4994;' />
+<rect x='29.61' y='2.96' width='19.70' height='19.70' style='stroke-width: 0.21; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #8C62AA;' />
+<rect x='9.91' y='2.96' width='19.70' height='19.70' style='stroke-width: 0.21; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #BE64AC;' />
+<rect x='49.32' y='22.66' width='19.70' height='19.70' style='stroke-width: 0.21; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #5698B9;' />
+<rect x='29.61' y='22.66' width='19.70' height='19.70' style='stroke-width: 0.21; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #A5ADD3;' />
+<rect x='9.91' y='22.66' width='19.70' height='19.70' style='stroke-width: 0.21; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #DFD0D6;' />
+<rect x='49.32' y='42.36' width='19.70' height='19.70' style='stroke-width: 0.21; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #5AC8C8;' />
+<rect x='29.61' y='42.36' width='19.70' height='19.70' style='stroke-width: 0.21; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #ACE4E4;' />
+<rect x='9.91' y='42.36' width='19.70' height='19.70' style='stroke-width: 0.21; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #E8E8E8;' />
 </g>
 <g clip-path='url(#cpMC4wMHw3Mi4wMHwwLjAwfDcyLjAw)'>
-<text x='8.97' y='69.02' style='font-size: 6.00px; font-family: Arial;' textLength='52.35px' lengthAdjust='spacingAndGlyphs'>% energy burdened</text>
-<text x='62.70' y='69.02' style='font-size: 6.00px; font-family: Symbol;' textLength='5.92px' lengthAdjust='spacingAndGlyphs'>→</text>
-<text transform='translate(4.98,62.70) rotate(-90)' style='font-size: 6.00px; font-family: Arial;' textLength='51.68px' lengthAdjust='spacingAndGlyphs'>Higher temperature</text>
-<text transform='translate(4.98,9.63) rotate(-90)' style='font-size: 6.00px; font-family: Symbol;' textLength='5.92px' lengthAdjust='spacingAndGlyphs'>→</text>
+<text x='8.94' y='70.00' style='font-size: 6.00px; font-family: "Arial";' textLength='52.35px' lengthAdjust='spacingAndGlyphs'>% energy burdened</text>
+<text x='62.68' y='70.00' style='font-size: 6.00px; font-family: "Symbol";' textLength='5.92px' lengthAdjust='spacingAndGlyphs'>→</text>
+<text transform='translate(5.00,51.20) rotate(-90)' style='font-size: 6.00px; font-family: "Arial";' textLength='28.68px' lengthAdjust='spacingAndGlyphs'>July temps</text>
+<text transform='translate(5.00,21.13) rotate(-90)' style='font-size: 6.00px; font-family: "Symbol";' textLength='5.92px' lengthAdjust='spacingAndGlyphs'>→</text>
 </g>
 </svg>

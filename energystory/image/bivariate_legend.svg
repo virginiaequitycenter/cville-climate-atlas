@@ -9,6 +9,9 @@
       stroke-linejoin: round;
       stroke-miterlimit: 10.00;
     }
+    .svglite text {
+      white-space: pre;
+    }
   ]]></style>
 </defs>
 <rect width='100%' height='100%' style='stroke: none; fill: none;'/>
@@ -36,9 +39,9 @@
 <rect x='9.91' y='42.36' width='19.70' height='19.70' style='stroke-width: 0.21; stroke: none; stroke-linecap: square; stroke-linejoin: miter; fill: #E8E8E8;' />
 </g>
 <g clip-path='url(#cpMC4wMHw3Mi4wMHwwLjAwfDcyLjAw)'>
-<text x='8.94' y='70.00' style='font-size: 6.00px; font-family: Arial;' textLength='52.35px' lengthAdjust='spacingAndGlyphs'>% energy burdened</text>
-<text x='62.68' y='70.00' style='font-size: 6.00px; font-family: Symbol;' textLength='5.92px' lengthAdjust='spacingAndGlyphs'>→</text>
-<text transform='translate(5.00,51.20) rotate(-90)' style='font-size: 6.00px; font-family: Arial;' textLength='28.68px' lengthAdjust='spacingAndGlyphs'>July temps</text>
-<text transform='translate(5.00,21.13) rotate(-90)' style='font-size: 6.00px; font-family: Symbol;' textLength='5.92px' lengthAdjust='spacingAndGlyphs'>→</text>
+<text x='8.94' y='70.00' style='font-size: 6.00px; font-family: "Arial";' textLength='52.35px' lengthAdjust='spacingAndGlyphs'>% energy burdened</text>
+<text x='62.68' y='70.00' style='font-size: 6.00px; font-family: "Symbol";' textLength='5.92px' lengthAdjust='spacingAndGlyphs'>→</text>
+<text transform='translate(5.00,51.20) rotate(-90)' style='font-size: 6.00px; font-family: "Arial";' textLength='28.68px' lengthAdjust='spacingAndGlyphs'>July temps</text>
+<text transform='translate(5.00,21.13) rotate(-90)' style='font-size: 6.00px; font-family: "Symbol";' textLength='5.92px' lengthAdjust='spacingAndGlyphs'>→</text>
 </g>
 </svg>
