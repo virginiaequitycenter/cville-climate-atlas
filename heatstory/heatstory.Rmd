@@ -501,3 +501,5 @@ function showDivs(n) {
 # https://www.w3docs.com/snippets/css/how-to-create-an-image-slider-or-slideshow.html
 # http://css3.bradshawenterprises.com/sliding/
 ```
+
+## Back to Story Site

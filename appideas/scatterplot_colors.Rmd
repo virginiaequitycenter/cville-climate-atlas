@@ -2,7 +2,7 @@
 title: Scatterplot Colors
 output: 
   html_document:
-    css: style.css
+    css: color_style.css
     toc: true
     toc_float: true
 ---

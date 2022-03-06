@@ -541,6 +541,11 @@ Source: CDC Places: Local Data for Better Health
 The series of visualizations above highlights how access to economic and environmental resources are related to important health outcomes. These data cannot prove a causal relationship. In other words, we're unable to say, "Having a lower household income causes someone to have poor mental health" based on these data alone. However, it is easy to imagine how having a lower household income adds additional stress to one's life -- anxiety about affording housing, childcare, health care -- so, communities with lower average household incomes tend to have higher levels of poor mental health. 
 
 
+## Back to Story Site
+
+<div class="home-style"><p style="text-align:center;"><a href="https://virginiaequitycenter.github.io/picturing-climate-stories/">Back to <img src="image/story_home_image.png" width="250" style="text-align:center"> Home</a></p></div>
+
+
 ### Notes
 
 [^1]: [See here for more information on asthma and air quality](https://www.edf.org/sites/default/files/documents/African%20American%20Communities%20and%20Climate%20Change.pdf)
