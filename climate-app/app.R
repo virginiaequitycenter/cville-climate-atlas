@@ -83,7 +83,7 @@ ui <- fluidPage(
                  ## indicator selectors and plots ----
                  tabPanel("Atlas",
                           # global instructions
-                          tags$div(style='font-size:15px; font-weight:bold;', tags$p("Select any two measures from the dropdown menus on the left and right side of the screen to see the relationship between the measures in census tracts across the Greater Charlottesville Region. Then use the sheet beside this computer to share your thoughts about patterns you find or new datasets that should be included in the future!")),
+                          tags$div(style='font-size:15px; font-weight:bold;', tags$p("Select any two measures from the dropdown menus on the left and right side of the screen to see the relationship between the measures in census tracts across the Greater Charlottesville Region. If you're viewing this from the exhibit in the Jefferson School, use the sheet beside this computer to share your thoughts about patterns you find or new datasets that should be included in the future!")),
                           
                           fluidRow(
                             # Sidebar for indicator 1
