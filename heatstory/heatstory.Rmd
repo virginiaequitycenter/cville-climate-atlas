@@ -502,4 +502,10 @@ function showDivs(n) {
 # http://css3.bradshawenterprises.com/sliding/
 ```
 
+<br>
+
+For more on urban heat islands, see the city of Charlottesville's Urban Heat Island Mapping Campaign: https<nolink>://www.charlottesville.gov/1469/Urban-Heat-Island-Mapping-Campaign
+
+<br>
+
 ## Back to Story Site
