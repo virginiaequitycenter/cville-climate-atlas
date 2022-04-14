@@ -1,7 +1,7 @@
 # ....................................
 # Begin Climate Equity Atlas Development
 # Authors: Michele Claibourn, Jacob Goldstein-Greenwood, Lee LeBoeuf
-# Last updated: 2022-03-05 mpc
+# Last updated: 2022-04-13 mpc, ll
 # ....................................
 
 # Phase 1a: added select indicators, output plotly scatterplot, add sample header
@@ -29,10 +29,12 @@
 #    add space to variable details, add plot orientation language, add global instructions
 #    add refresh button
 
+# April update
+#   add walkability measures
+
 # To do
 #    ?add layering points (parks, schools, food retailers)
 #    ?add block group data and selector for geography
-#    ?add county or block level data?
 
 # ....................................
 # Load libraries and data
@@ -60,7 +62,7 @@ fewpal <- c("#265dab", "#df5c24", "#c7b42e", "#059748",
             "#cb2027", "#9d722a")
 
 # no-go variables for mapping
-cant_map <- c('indigE', 'othraceE', 'bbmax_up', 'HWAV_AFREQ', 'RFLD_AFREQ')
+cant_map <- c('indigE', 'othraceE', 'bbmax_up', 'HWAV_AFREQ', 'RFLD_AFREQ', 'avg_prox_transit_rank')
 cant_map_message <- c("One of your selected variables cannot be rendered in the map or in the tercile plot. This is usually because there isn't enough variation in the variable to break its values up into meaningful categories.")
 
 
