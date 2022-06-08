@@ -31,10 +31,13 @@
 
 # April update
 #   add walkability measures
+# May
+#   add foreign born and snap variables
 
-# To do
-#    ?add layering points (parks, schools, food retailers)
-#    ?add block group data and selector for geography
+# To do?
+#    after exhibit, add links to stories and sonification; 
+#     and add links on story page to app?
+#    add layering points (parks, schools, food retailers)
 
 # ....................................
 # Load libraries and data

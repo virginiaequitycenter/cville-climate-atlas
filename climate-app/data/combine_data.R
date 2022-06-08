@@ -83,7 +83,11 @@ nlcd <- read_csv("data-csv/nlcd_cville_tract.csv") %>%
   select(geoid, locality = COUNTYFP, 
          tree_can:imp_surf, percent_dev:percent_for)
 
-# ejs <- read_csv()
+ejs <- read_csv("data-csv/ejscreen_cville_tract.csv") %>%
+  mutate(locality = as.character(str_sub(tract, 3, 5))) %>%
+  mutate(geoid = as.character(tract)) %>%
+  select(DSLPM, CANCER, RESP, PTRAF, PWDIS, PNPL,
+         PRMP, PTSDF, OZONE, PM25, geoid, locality)
 
 walk <- read_csv("data-csv/walk_cville_tract.csv") %>%
   mutate(locality = as.character(str_sub(FIPS_TRACT, 3, 5))) %>%
@@ -118,6 +122,7 @@ df <- acs %>%
   left_join(ls8) %>% 
   left_join(nri) %>% 
   left_join(walk) %>%
+  left_join(ejs) %>%
   select(-state)
 
 df <- df %>% 
@@ -146,13 +151,13 @@ pretty_nlc <- googlesheets4::read_sheet(url_sheet, sheet = "nlcd")
 pretty_ls8 <- googlesheets4::read_sheet(url_sheet, sheet = "landsat8")
 pretty_nri <- googlesheets4::read_sheet(url_sheet, sheet = "fema_nri")
 pretty_wlk <- googlesheets4::read_sheet(url_sheet, sheet = "walkability")
+pretty_ejs <- googlesheets4::read_sheet(url_sheet, sheet = "ejscreen")
 #pretty_nfh <- googlesheets4::read_sheet(url_sheet, sheet = "nfhl")
-#pretty_ejs <- googlesheets4::read_sheet(url_sheet, sheet = "ejscreen")
 
 pretty <- bind_rows(pretty_acs, pretty_cdc, pretty_air,
                     pretty_lex, pretty_dym, pretty_fcc,
                     pretty_leb, pretty_nlc, pretty_ls8,
-                    pretty_nri, pretty_wlk)
+                    pretty_nri, pretty_wlk, pretty_ejs)
 
 # Adapt Clay's code to assign attributes
 # add pretty metadata to as var attribute: name, source, description
