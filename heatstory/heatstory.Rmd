@@ -396,7 +396,7 @@ ls8_jul4_geo_cvl <- ls8_jul4_geo_cvl %>%
          )
 
 ## income, race
-acs <- read_csv("../data-csv/acs_cville_blkgp.csv")
+acs <- read_csv("../data-csv/acs_blkgr_cville.csv")
 acs <- acs %>% mutate(GEOID = as.character(GEOID))
 
 # join to jul 4
@@ -502,10 +502,10 @@ function showDivs(n) {
 # http://css3.bradshawenterprises.com/sliding/
 ```
 
-<br>
+## Learn More
 
-For more on urban heat islands, see the city of Charlottesville's Urban Heat Island Mapping Campaign: https<nolink>://www.charlottesville.gov/1469/Urban-Heat-Island-Mapping-Campaign
+* For more on urban heat islands, see the city of Charlottesville's Urban Heat Island Mapping Campaign: https://www.charlottesville.gov/1469/Urban-Heat-Island-Mapping-Campaign
+* Visit the Charlottesville Regional Climate Equity Atlas to explore additional social, infrastructure, and climate measures, and patterns among them, for our local area: https://virginiaequitycenter.shinyapps.io/climate-app/
 
-<br>
 
 ## Back to Story Site

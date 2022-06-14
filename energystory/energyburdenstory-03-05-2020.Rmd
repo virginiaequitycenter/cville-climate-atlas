@@ -495,7 +495,8 @@ leaflet() %>%
 
 ## Learn more
 
-For an in-depth look at energy burden in the city of Charlottesville and solutions, view the Community Climate Collaborative's work on energy inequity in Charlottesville: https<nolink>://theclimatecollaborative.org/uncovering-energy-inequity
+* For an in-depth look at energy burden in the city of Charlottesville and solutions, view the Community Climate Collaborative's work on energy inequity in Charlottesville: https://theclimatecollaborative.org/uncovering-energy-inequity
+* Visit the Charlottesville Regional Climate Equity Atlas to explore additional social, infrastructure, and climate measures, and patterns among them, for our local area: https://virginiaequitycenter.shinyapps.io/climate-app/
 
 ## Back to Story Site
 
