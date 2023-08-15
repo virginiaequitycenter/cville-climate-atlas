@@ -2,6 +2,7 @@
 # Begin Climate Equity Atlas Development
 # Authors: Michele Claibourn, Jacob Goldstein-Greenwood, Lee LeBoeuf
 # Last updated: 2022-04-13 mpc, ll
+# Replaced with updated app, see tag v1.0 in Github repo for all files at this stage of development
 # ....................................
 
 # Phase 1a: added select indicators, output plotly scatterplot, add sample header

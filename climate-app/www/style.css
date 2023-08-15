@@ -2,17 +2,17 @@
 /* make most text bigger, default is 14, 
    to contrast with smaller side bar description text,
    styled in the UI with span */
-body {
+/* body {
   font-size: 15px;
-}
+} */
 
-.selectize-input { font-size: 15px; line-height: 15px;}
-.selectize-dropdown { font-size: 15px; line-height: 15px; }
+/* .selectize-input { font-size: 15px; line-height: 15px;} */
+/* .selectize-dropdown { font-size: 15px; line-height: 15px; } */
 
 
 /* get the ec heat logo in the upper right navbar */
-#img-id{
+/* #img-id{
 position: fixed;
 right: 10px;
 top: 1px;
-}
+} */
