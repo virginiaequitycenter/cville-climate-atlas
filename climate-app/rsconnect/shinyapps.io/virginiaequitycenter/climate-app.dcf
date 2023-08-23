@@ -5,7 +5,10 @@ account: virginiaequitycenter
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 5696305
-bundleId: 5989474
+bundleId: 7580296
 url: https://virginiaequitycenter.shinyapps.io/climate-app/
-when: 1654699707.14632
-lastSyncTime: 1654699707.14635
+when: 1692295822.47094
+lastSyncTime: 1692295822.47095
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: app_2022.R|data/combine_data.R|data/cvl_data_geo.RDS|data/cvl_data.RDS|new-app.R

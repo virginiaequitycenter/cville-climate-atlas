@@ -1,8 +1,10 @@
+# USE APP.R FOR UPDATES FILE NOT THIS ONE
+# NOT ACTIVE APP, JUST USED FOR DEVELOPEMENT
 # ....................................
-# Begin Climate Equity Atlas Development
-# Authors: Michele Claibourn, Jacob Goldstein-Greenwood, Lee LeBoeuf, Beth Mitchell
-# Last updated: 2023-08-11 mpc, ll
-# Last deployed: -
+# Charlottesville Regional Climate Equity Atlas Dashboard
+# Authors: Michele Claibourn, Jacob Goldstein-Greenwood, Lee LeBoeuf, Elizabeth Mitchell
+# Last updated: 2023-08-17 eam
+# Last deployed: 2023-08-17 eam
 # ....................................
 
 # ....................................
@@ -10,14 +12,12 @@
 library(shiny)
 library(tidyverse)
 library(plotly)
-# library(ggthemes)
 library(leaflet)
 library(biscale) # for tercile plots
 library(sf)
 library(leafem)
 library(stringi) # for tercile plots
 library(knitr)
-# library(htmltools)
 library(DT)
 library(bslib)
 
@@ -112,7 +112,6 @@ ui <- htmlTemplate(filename = "climate-app-template.html", main =
                   # actionButton(inputId = "refresh", "Refresh Atlas") # removed and replaced with reset map button
                   )
                 ) %>% tagAppendAttributes(class="mb-3 mb-sm-0")
-      
               ), br(),  # end fluidRow
               fluidRow(
                 column(
@@ -125,10 +124,10 @@ ui <- htmlTemplate(filename = "climate-app-template.html", main =
                       h2(textOutput("maptitle", inline = TRUE)),
                       cardComponent(
                       accordianComponent("map-desc", "Map Instructions",
-                                         "<p>This map shows how each census tract is ranked from Low to High on the measures selected above (Variable 1 & Variable 2). The legend in the upper left corner of the map provides a key for what each color represents.</p>
-                                       <p>For example, if the values of both variables are Low, the census tract appears gray. When the value of Variable 1 is Low and the value of Variable 2 is High the track will be pink; when Variable 1 is High and Variable 2 is Low the tract will be green; When both variables have a High value, the tract appears dark blue.</p>
-                                         <p>Click on the tracts to see the values for each measure and how the tract ranks (Low, Medium, High) relative to others in the selected region. Zoom in to see specific areas more closely; click the reset button on the map to see the full region.</p>",
-                                         "mapdesc-1", "mapdesc-2")
+                          "<p>This map shows how each census tract is ranked from Low to High on the measures selected above (Variable 1 & Variable 2). The legend in the upper left corner of the map provides a key for what each color represents.</p>
+                          <p>For example, if the values of both variables are Low, the census tract appears gray. When the value of Variable 1 is Low and the value of Variable 2 is High the track will be pink; when Variable 1 is High and Variable 2 is Low the tract will be green; When both variables have a High value, the tract appears dark blue.</p>
+                          <p>Click on the tracts to see the values for each measure and how the tract ranks (Low, Medium, High) relative to others in the selected region. Zoom in to see specific areas more closely; click the reset button on the map to see the full region.</p>",
+                          "mapdesc-1", "mapdesc-2")
                       ), br(),
                       leafletOutput(outputId = 'leaf', width = '100%', height = 600)
                     ),
@@ -138,24 +137,24 @@ ui <- htmlTemplate(filename = "climate-app-template.html", main =
                       h2(textOutput("comptitle", inline = TRUE)),
                       cardComponent(
                       accordianComponent("comp-desc", "Correlation Plot Instructions",
-                                         "<p>This plot shows the correlation, or relationship, between the two selected variables for the localities selected.</p>
-                                       <p>Each census tract is represented by a circle, plotted by the values of the measures selected above. The size of each circle is based on the population of that tract so that tracts with more people appear larger and those with less people appear smaller. The color of the circle is based on the locality.</p>
-                                         <p>The gray figures on the top and right show how frequently high and low values of the selected variables occur in the region; taller bars mean that range of values is more common.</p>",
-                                         "compdesc-1", "compdesc-2")
+                          "<p>This plot shows the correlation, or relationship, between the two selected variables for the localities selected.</p>
+                          <p>Each census tract is represented by a circle, plotted by the values of the measures selected above. The size of each circle is based on the population of that tract so that tracts with more people appear larger and those with less people appear smaller. The color of the circle is based on the locality.</p>
+                          <p>The gray figures on the top and right show how frequently high and low values of the selected variables occur in the region; taller bars mean that range of values is more common.</p>",
+                          "compdesc-1", "compdesc-2")
                       ), br(),
-
-                      # p("This plot shows the correlation, or relationship, between the two selected variables for the localities selected."), 
-                      # p("Each census tract is represented by a circle, plotted by the values of the measures selected above. The size of each circle is based on the population of that tract so that tracts with more people appear larger and those with less people appear smaller. The color of the circle is based on the locality."),
-                      # p("The gray figures on the top and right show how frequently high and low values of the selected variables occur in the region; taller bars mean that range of values is more common."),
                       plotlyOutput(outputId = "scatterplot", width = '100%', height = 600)
                     ),
                     tabPanel(
                       title = "Differences",
                       icon = icon('chart-simple'),
                       h2(textOutput("difftitle", inline = TRUE)),
-                      p("This plot divides the census tracts in the selected localities into three groups, representing the Low, Middle, and High values of the measure selected for Variable 1."),  
-                      p("The height of the bar shows the average value of the measure selected for Variable 2 within that group of tracts. Hover over each bar to see the average value of Variable 2."),
-                      p("For Example, when Estimated Population (Variable 1) and Average Land Surface Temperature (Variable 2) are selected, this tercile plot shows that the tracts with the Lowest populations have an average value of the Average Land Surface Temperature of 96.7, and the tracts with the Highest populations have an average value of the Average Land Surface Temperature of 92.5."),
+                      cardComponent(
+                      accordianComponent("diff-desc", "Tercile Plot Instructions",
+                          "<p>This plot divides the census tracts in the selected localities into three groups, representing the Low, Middle, and High values of the measure selected for Variable 1.</p>
+                          <p>The height of the bar shows the average value of the measure selected for Variable 2 within that group of tracts. Hover over each bar to see the average value of Variable 2.</p>
+                          <p>For Example, when Estimated Population (Variable 1) and Average Land Surface Temperature (Variable 2) are selected, this tercile plot shows that the tracts with the Lowest populations have an average value of the Average Land Surface Temperature of 96.7, and the tracts with the Highest populations have an average value of the Average Land Surface Temperature of 92.5.</p>",
+                          "diffdesc-1", "diffdesc-2")
+                      ), br(),
                       plotlyOutput(outputId = 'tercile_plot', width = '100%', height = 500)
                     ),
                     tabPanel(title = "Data Table",
@@ -174,7 +173,7 @@ ui <- htmlTemplate(filename = "climate-app-template.html", main =
                       h3("Download Data"),
                       p("Data in this Atlas is provided as a compressed folder, which includes CSVs for data at the census tract level and a data dictionary."),
                       downloadButton("downloadBtn", "Download"),
-                      br(), hr(), 
+                      # br(), hr(), 
                       h4("Citation"),
                       p("The Equity Center, Democratization of Data Initiative; \"Charlottesville Regional Climate Equity Dashboard\"; An Initiative of the UVA Karsh Institute of Democracy Center for the Redress of Inequity Through Community-Engaged Scholarship; Accessed ", Sys.Date(), "; https://equityatlas.virginiaequitycenter.org/dashboards/climate-dashboard/.")
                       

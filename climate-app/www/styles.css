@@ -90,6 +90,27 @@ h1 {
 padding-left: calc(var(--bs-gutter-x) * .5);
 margin: 0 auto;
   }
+
+  .navbar div.nav-heading {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  /* .navbar div.nav-heading img {
+    height: calc(1.325rem + 1vw) !important;
+  } */
+
+  .navbar div.nav-heading h1 {
+    margin: 0 12px;
+    font-size: calc(1.325rem + .9vw);
+  }
+
+  /* @media (max-width: 768px) {
+    .navbar div.nav-heading img {
+        display: none;
+    }
+  } */
   
   /* .navbar .navbar-brand {
     color: white;  
