@@ -1,6 +1,9 @@
 .Rproj.user
 .Rhistory
+.Rapp.history
 .DS_Store
 appideas/misc/*
 *.dcf
-climate-app/rsconnect/shinyapps.io/virginiaequitycenter/climate-app.dcf
+
+# ignore shinyapps connection
+climate-app/rsconnect/*

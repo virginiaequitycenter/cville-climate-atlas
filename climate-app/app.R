@@ -2,7 +2,8 @@
 # ....................................
 # Charlottesville Regional Climate Equity Atlas Dashboard
 # Authors: Michele Claibourn, Jacob Goldstein-Greenwood, Lee LeBoeuf, Elizabeth Mitchell
-# Last updated: 2023-08-17 eam
+# Last updated: 2024-03-15 eam
+  # Added argument `selectize = FALSE` to selectInput() for shiny package v.1.8
 # Last deployed: 2023-08-17 eam
 # ....................................
 # App updated 8-2023 for inclusion as dashboard in the Equity Atlas, see app_2022.R for previous version
@@ -81,7 +82,8 @@ ui <- htmlTemplate(filename = "climate-app-template.html", main =
                     selectInput(inputId = "indicator1",
                                 label = "Select Variable 1:",
                                 choices = ind_demfirst_ct,
-                                selected = ind_demfirst_ct$`Demographic & Social`["Estimated Population"]),
+                                selected = ind_demfirst_ct$`Demographic & Social`["Estimated Population"],
+                                selectize = FALSE),
                     accordianComponentSource("ind1", "Show Selected Variable Definition & Source", textOutput("ind1_defn", inline = TRUE), textOutput("ind1_source", inline = TRUE),"var-def-1", "map-ind-1")
                     )
                 ) %>% tagAppendAttributes(class="mb-3 mb-sm-0"),
@@ -91,7 +93,8 @@ ui <- htmlTemplate(filename = "climate-app-template.html", main =
                     selectInput(inputId = "indicator2",
                                 label = "Select Variable 2:",
                                 choices = ind_climfirst_ct,
-                                selected = ind_climfirst_ct$`Climate Measures`["Average Land Surface Temperature"]),
+                                selected = ind_climfirst_ct$`Climate Measures`["Average Land Surface Temperature"],
+                                selectize = FALSE),
                     accordianComponentSource("ind2", "Show Selected Variable Definition & Source", textOutput("ind2_defn", inline = TRUE),textOutput("ind2_source", inline = TRUE),"var-def-2", "map-ind-2")
                     )
                 ) %>% tagAppendAttributes(class="mb-3 mb-sm-0"),
